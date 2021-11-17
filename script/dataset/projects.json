@@ -1,0 +1,14 @@
+[
+    {
+        "name": "APPLICATION",
+        "description": "Application auth API JWT gRPC",
+        "credential": "SBxlxcZVXQZV-YpqihEw1DM4b",
+        "key": "SK9PF0W7R7NTCMB1NVKPEH8BP4WT0BGQ71HN8D1HRFYJEMQXVS",
+        "hashAlgoritm": "",
+        "roundsHash": 1,
+        "createBy": "ADMIN",
+        "createdAt": "2021-09-15 09:00:",
+        "updatedBy": null,
+        "updatedAt": null
+    }
+]

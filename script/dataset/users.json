@@ -1,0 +1,15 @@
+[
+    {
+        "name": "Guilherme",
+        "lastName": "Alves",
+        "email": "guilherme.alves@gmail.com",
+        "username": "admin",
+        "password": "33efb665009b452af9048edfd1963c00c25fc4c5",
+        "documentNumber": "123.456.789-01",
+        "lastLogin": "2021-09-15 09:00",
+        "createdBy": "ADMIN",
+        "createdAt": "2021-09-15 09:00:00",
+        "updatedBy": null,
+        "updatedAt": null
+    }
+]
