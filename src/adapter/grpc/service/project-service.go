@@ -1,0 +1,41 @@
+package service
+
+import (
+	"api-auth/src/adapter/grpc/pb"
+	"api-auth/src/adapter/repository"
+	"api-auth/src/entity"
+	"api-auth/src/usecase"
+	"context"
+)
+
+type ProjectServiceGRPC struct {
+	Repository entity.ProjectRepository
+	pb.UnimplementedProjectsServer
+}
+
+func NewProjectServiceGRPC(db repository.DocumentDB, cache repository.Cache) *ProjectServiceGRPC {
+	repo := repository.NewProjectRepositoryDB(db, cache)
+
+	return &ProjectServiceGRPC{
+		Repository: repo,
+	}
+}
+
+func (s *ProjectServiceGRPC) CreateProject(ctx context.Context, in *pb.CreateProjectRequest) (*pb.CreateProjectReply, error) {
+	input := usecase.ProjectDtoInput{
+		Name:         in.Project.Name,
+		Description:  in.Project.Description,
+		HashAlgoritm: in.Project.HashAlgoritm,
+		RoudHash:     uint(in.Project.RoundsHash),
+	}
+
+	processProject := usecase.NewProcessProject(s.Repository)
+
+	output, err := processProject.ExecuteCreateNewProject(input)
+
+	return &pb.CreateProjectReply{
+		Error:      output.Error,
+		StatusCode: output.Status,
+		ProjectId:  output.ID,
+	}, err
+}

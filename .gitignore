@@ -1,3 +1,6 @@
 .vscode/
 
 venv/
+
+auth
+example.go

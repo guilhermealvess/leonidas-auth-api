@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option go_package = "./;pb";
+
+message Account {
+    string name = 1;
+    string lastName = 2;
+    string email = 3;
+    string username = 4;
+    string documentNumber = 5;
+    string projectId = 6;
+}
+
+message CreateAccounttRequest {
+    Account account = 1;
+}
+
+message CreateAccountReply {
+    string error = 1;
+    int32 statusCode = 2;
+    string accountId = 3;
+}
+
+service AccountServices {
+    rpc CreateAccount (CreateAccounttRequest) returns (CreateAccountReply) {};
+}

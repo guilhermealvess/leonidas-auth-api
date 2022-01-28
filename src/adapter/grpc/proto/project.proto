@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option go_package = "./;pb";
+
+message Project {
+    string name = 1;
+    string description = 2;
+    string hashAlgoritm = 3;
+    int32 roundsHash = 4;
+}
+
+message CreateProjectRequest {
+    Project project = 1;
+}
+
+message CreateProjectReply {
+    string error = 1;
+    int32 statusCode = 2;
+    string projectId = 3;
+}
+
+service Projects {
+    rpc CreateProject (CreateProjectRequest) returns (CreateProjectReply) {};
+}

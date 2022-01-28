@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+option go_package = "./;pb";
+
+message SigninRequest {
+    string username = 1;
+    string password = 2;
+    string projectId = 3;
+}
+
+message SigninReply {
+    string error = 1;
+    int32 statusCode = 2;
+    string token = 3;
+}
+
+message VerifyTokenRequest {
+    string token = 1;
+}
+
+message VerifyTokenReply {
+    string error = 1;
+    int32 statusCode = 2;
+    string payload = 3;
+}
+
+message RefreshTokenRequest {
+    string token = 1;
+}
+
+message RefreshTokenReply {
+    string error = 1;
+    int32 statusCode = 2;
+    string token = 3;
+}
+
+service Authenticator {
+    rpc Login (SigninRequest) returns (SigninReply) {};
+
+    rpc VerifyToken (VerifyTokenRequest) returns (VerifyTokenReply) {};
+
+    rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenReply) {};
+}
