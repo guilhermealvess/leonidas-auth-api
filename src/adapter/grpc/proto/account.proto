@@ -6,13 +6,14 @@ message Account {
     string name = 1;
     string lastName = 2;
     string email = 3;
-    string username = 4;
-    string documentNumber = 5;
-    string projectId = 6;
+    string password = 4;
+    string projectId = 5;
 }
 
 message CreateAccounttRequest {
     Account account = 1;
+    string credentials = 2;
+    string key = 3;
 }
 
 message CreateAccountReply {

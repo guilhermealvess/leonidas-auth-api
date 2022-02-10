@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthenticatorClient interface {
-	Login(ctx context.Context, in *SigninRequest, opts ...grpc.CallOption) (*SigninReply, error)
+	SignIn(ctx context.Context, in *SigninRequest, opts ...grpc.CallOption) (*SigninReply, error)
 	VerifyToken(ctx context.Context, in *VerifyTokenRequest, opts ...grpc.CallOption) (*VerifyTokenReply, error)
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenReply, error)
 }
@@ -31,9 +31,9 @@ func NewAuthenticatorClient(cc grpc.ClientConnInterface) AuthenticatorClient {
 	return &authenticatorClient{cc}
 }
 
-func (c *authenticatorClient) Login(ctx context.Context, in *SigninRequest, opts ...grpc.CallOption) (*SigninReply, error) {
+func (c *authenticatorClient) SignIn(ctx context.Context, in *SigninRequest, opts ...grpc.CallOption) (*SigninReply, error) {
 	out := new(SigninReply)
-	err := c.cc.Invoke(ctx, "/Authenticator/Login", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Authenticator/SignIn", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *authenticatorClient) RefreshToken(ctx context.Context, in *RefreshToken
 // All implementations must embed UnimplementedAuthenticatorServer
 // for forward compatibility
 type AuthenticatorServer interface {
-	Login(context.Context, *SigninRequest) (*SigninReply, error)
+	SignIn(context.Context, *SigninRequest) (*SigninReply, error)
 	VerifyToken(context.Context, *VerifyTokenRequest) (*VerifyTokenReply, error)
 	RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenReply, error)
 	mustEmbedUnimplementedAuthenticatorServer()
@@ -72,8 +72,8 @@ type AuthenticatorServer interface {
 type UnimplementedAuthenticatorServer struct {
 }
 
-func (UnimplementedAuthenticatorServer) Login(context.Context, *SigninRequest) (*SigninReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+func (UnimplementedAuthenticatorServer) SignIn(context.Context, *SigninRequest) (*SigninReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
 }
 func (UnimplementedAuthenticatorServer) VerifyToken(context.Context, *VerifyTokenRequest) (*VerifyTokenReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyToken not implemented")
@@ -94,20 +94,20 @@ func RegisterAuthenticatorServer(s grpc.ServiceRegistrar, srv AuthenticatorServe
 	s.RegisterService(&Authenticator_ServiceDesc, srv)
 }
 
-func _Authenticator_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Authenticator_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SigninRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthenticatorServer).Login(ctx, in)
+		return srv.(AuthenticatorServer).SignIn(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Authenticator/Login",
+		FullMethod: "/Authenticator/SignIn",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticatorServer).Login(ctx, req.(*SigninRequest))
+		return srv.(AuthenticatorServer).SignIn(ctx, req.(*SigninRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -156,8 +156,8 @@ var Authenticator_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthenticatorServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Login",
-			Handler:    _Authenticator_Login_Handler,
+			MethodName: "SignIn",
+			Handler:    _Authenticator_SignIn_Handler,
 		},
 		{
 			MethodName: "VerifyToken",

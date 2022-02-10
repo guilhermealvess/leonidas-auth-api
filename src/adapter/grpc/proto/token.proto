@@ -16,12 +16,22 @@ message SigninReply {
 
 message VerifyTokenRequest {
     string token = 1;
+    string projectId = 2;
+}
+
+message Payload {
+    string id = 1;
+    string username = 2;
+    string email = 3;
+    string documentNumber = 4;
+    int64 issueAt = 5;
+    int64 expiredAt = 6; 
 }
 
 message VerifyTokenReply {
     string error = 1;
     int32 statusCode = 2;
-    string payload = 3;
+    Payload Payload = 3;
 }
 
 message RefreshTokenRequest {
@@ -35,7 +45,7 @@ message RefreshTokenReply {
 }
 
 service Authenticator {
-    rpc Login (SigninRequest) returns (SigninReply) {};
+    rpc SignIn (SigninRequest) returns (SigninReply) {};
 
     rpc VerifyToken (VerifyTokenRequest) returns (VerifyTokenReply) {};
 

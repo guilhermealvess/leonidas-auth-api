@@ -1,36 +1,43 @@
 package jwt
 
 import (
-	"fmt"
+	"api-auth/src/usecase"
+	"errors"
 	"os"
+	"time"
 
 	"github.com/brianvoe/sjwt"
 )
 
 type JWTMaker struct {
-	JWT
+	usecase.JWT
 }
 
 func NewJWTMaker() *JWTMaker {
 	return &JWTMaker{}
 }
 
-func (j *JWTMaker) SignIn() error {
-	return nil
-}
+func (j *JWTMaker) CreateToken(payload usecase.Payload) (string, error) {
+	claims, _ := sjwt.ToClaims(payload)
 
-func (j *JWTMaker) Verify() error {
-	return nil
-}
-
-func example() {
-	// Set Claims
-	claims := sjwt.New()
-	claims.Set("username", "billymister")
-	claims.Set("account_id", 8675309)
-
-	// Generate jwt
 	secretKey := []byte(os.Getenv("JWT_SECRET"))
-	jwt := claims.Generate(secretKey)
-	fmt.Println(jwt)
+	return claims.Generate(secretKey), nil
+}
+
+func (j *JWTMaker) Verify(tokenJWT string) (*usecase.Payload, error) {
+
+	hasVerified := sjwt.Verify(tokenJWT, []byte(os.Getenv("JWT_SECRET")))
+	if !hasVerified {
+		return &usecase.Payload{}, errors.New("TOKEN INVALIDO")
+	}
+
+	claims, _ := sjwt.Parse(tokenJWT)
+	payload := &usecase.Payload{}
+	claims.ToStruct(payload)
+
+	if time.Now().After(payload.ExpiredAt) {
+		return payload, errors.New("TOKEN EXPIRADO")
+	}
+
+	return payload, nil
 }

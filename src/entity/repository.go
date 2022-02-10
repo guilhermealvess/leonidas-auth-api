@@ -11,7 +11,9 @@ type ProjectRepository interface {
 }
 
 type AccountRepository interface {
-	Insert(name string, desciption string, hashAlgoritm string, roundsHash uint) error
+	Insert(account Account) (primitive.ObjectID, error)
 
 	FindByID(id string) error
+
+	FindByEmail(email string, projectId string) (*Account, error)
 }

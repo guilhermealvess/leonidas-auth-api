@@ -52,9 +52,12 @@ func startGRPCServer(db repository.DocumentDB, cache repository.Cache) {
 
 	log.Println("START GRPC SERVE ON PORT " + os.Getenv("GRPC_PORT"))
 
-	grpcServer := grpc.NewServer()
 	projectService := service.NewProjectServiceGRPC(db, cache)
+	accountService := service.NewAccountServiceGRPC(db, cache)
+
+	grpcServer := grpc.NewServer()
 	pb.RegisterProjectsServer(grpcServer, projectService)
+	pb.RegisterAccountServicesServer(grpcServer, accountService)
 	reflection.Register(grpcServer)
 
 	if err := grpcServer.Serve(lis); err != nil {

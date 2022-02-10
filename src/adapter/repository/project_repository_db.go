@@ -24,7 +24,6 @@ func NewProjectRepositoryDB(db DocumentDB, cache Cache) *ProjectRepositoryDB {
 }
 
 func (p *ProjectRepositoryDB) Insert(project entity.Project) (primitive.ObjectID, error) {
-
 	oid, err := p.documentDB.InsertOne(PROJECTS, project)
 	if err == nil {
 		project.ID = oid
