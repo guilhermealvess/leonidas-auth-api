@@ -28,7 +28,7 @@ func (s *AccountServiceGRPC) CreateAccount(ctx context.Context, in *pb.CreateAcc
 	input := usecase.AccountDtoInput{
 		Name:        in.Account.Name,
 		LastName:    in.Account.LastName,
-		Credentials: in.Credentials,
+		Credentials: in.Credential,
 		Key:         in.Key,
 		Email:       in.Account.Email,
 		Password:    in.Account.Password,

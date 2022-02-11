@@ -3,9 +3,10 @@ syntax = "proto3";
 option go_package = "./;pb";
 
 message SigninRequest {
-    string username = 1;
+    string email = 1;
     string password = 2;
-    string projectId = 3;
+    string credential = 3;
+    string key = 4;
 }
 
 message SigninReply {
@@ -21,11 +22,9 @@ message VerifyTokenRequest {
 
 message Payload {
     string id = 1;
-    string username = 2;
-    string email = 3;
-    string documentNumber = 4;
-    int64 issueAt = 5;
-    int64 expiredAt = 6; 
+    string email = 2;
+    int64 issueAt = 3;
+    int64 expiredAt = 4; 
 }
 
 message VerifyTokenReply {

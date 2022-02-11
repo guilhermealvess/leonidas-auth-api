@@ -12,7 +12,7 @@ message Account {
 
 message CreateAccounttRequest {
     Account account = 1;
-    string credentials = 2;
+    string credential = 2;
     string key = 3;
 }
 

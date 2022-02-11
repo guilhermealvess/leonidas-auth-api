@@ -17,6 +17,8 @@ message CreateProjectReply {
     string error = 1;
     int32 statusCode = 2;
     string projectId = 3;
+    string credential = 4;
+    string key = 5;
 }
 
 service Projects {

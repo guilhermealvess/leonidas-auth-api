@@ -169,5 +169,5 @@ var Authenticator_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "token.proto",
+	Metadata: "authenticator.proto",
 }

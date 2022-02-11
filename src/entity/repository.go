@@ -16,4 +16,6 @@ type AccountRepository interface {
 	FindByID(id string) error
 
 	FindByEmail(email string, projectId string) (*Account, error)
+
+	Update(account Account) error
 }

@@ -97,6 +97,10 @@ func calculateHash(str string, algorithm string) string {
 	return strHash
 }
 
-func (a *Account) CreateAccount() error {
-	return nil
+func (a *Account) VerifyPassword(password string, rounds uint, algorithm string) bool {
+	for i := 0; i < int(rounds); i++ {
+		password = calculateHash(password, algorithm)
+	}
+
+	return password == a.Password
 }
