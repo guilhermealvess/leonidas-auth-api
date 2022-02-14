@@ -26,7 +26,7 @@ func (s *ProjectServiceGRPC) CreateProject(ctx context.Context, in *pb.CreatePro
 		Name:         in.Project.Name,
 		Description:  in.Project.Description,
 		HashAlgoritm: in.Project.HashAlgoritm,
-		RoudHash:     uint(in.Project.RoundsHash),
+		RoundHash:    uint(in.Project.RoundHash),
 	}
 
 	processProject := usecase.NewProcessProject(s.Repository)

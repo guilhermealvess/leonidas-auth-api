@@ -63,7 +63,7 @@ func (a *Account) SavePassword(password, algorithm string, rounds uint) error {
 	if algorithm != "SHA256" && algorithm != "SHA1" && algorithm != "SHA512" && algorithm != "MD5" {
 		return errors.New("Algorithm invalid")
 	}
-	for i := 0; uint(i) <= rounds; i++ {
+	for i := 0; i < int(rounds); i++ {
 		password = calculateHash(password, algorithm)
 	}
 

@@ -56,7 +56,7 @@ func (p *ProcessAuthenticator) Sign(input ProcessSignInput) (*ProcessSignOutput,
 		return &ProcessSignOutput{}, err
 	}
 
-	if !account.VerifyPassword(input.Password, project.RoudHash, project.HashAlgoritm) {
+	if !account.VerifyPassword(input.Password, project.RoundHash, project.HashAlgoritm) {
 		return &ProcessSignOutput{}, err
 	}
 

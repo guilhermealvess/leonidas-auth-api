@@ -9,7 +9,7 @@ type ProjectDtoInput struct {
 	Description  string
 	HashAlgoritm string
 	Name         string
-	RoudHash     uint
+	RoundHash    uint
 }
 
 type ProjectDtoOutput struct {
@@ -33,7 +33,7 @@ func (p *ProcessProject) ExecuteCreateNewProject(projectInput ProjectDtoInput) (
 	project.Description = projectInput.Description
 	project.HashAlgoritm = projectInput.HashAlgoritm
 	project.Name = projectInput.Name
-	project.RoudHash = projectInput.RoudHash
+	project.RoundHash = projectInput.RoundHash
 
 	err := project.IsValid()
 	if err == nil {

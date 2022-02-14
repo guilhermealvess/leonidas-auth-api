@@ -17,7 +17,7 @@ type Project struct {
 	ID           primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
 	Description  string             `bson:"description,omitempty"`
 	HashAlgoritm string             `bson:"hashAlgoritm,omitempty"`
-	RoudHash     uint               `bson:"roundHash,omitempty"`
+	RoundHash    uint               `bson:"roundHash,omitempty"`
 	Credential   string             `bson:"credential,omitempty"`
 	Key          string             `bson:"key,omitempty"`
 	Secret       string             `bson:"secret,omitempty"`
@@ -62,7 +62,7 @@ func (p *Project) generateStringRandom(length uint) string {
 }
 
 func (p *Project) IsValid() error {
-	if p.RoudHash < 1 || p.RoudHash > 60 {
+	if p.RoundHash < 1 || p.RoundHash > 60 {
 		return errors.New("Round Hash over limit permit")
 	}
 

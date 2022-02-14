@@ -2,23 +2,26 @@ package service
 
 import (
 	"api-auth/src/adapter/grpc/pb"
-	"api-auth/src/entity"
+	"api-auth/src/adapter/repository"
 	"api-auth/src/usecase"
 	"context"
 )
 
 type AuthenticatorServiceGRPC struct {
 	pb.UnimplementedAuthenticatorServer
-	projectRepository entity.ProjectRepository
-	accountRepository entity.AccountRepository
-	jwtMaker          usecase.JWT
+	db       repository.DocumentDB
+	cache    repository.Cache
+	jwtMaker usecase.JWT
+
+	//projectRepository entity.ProjectRepository
+	//accountRepository entity.AccountRepository
 }
 
-func NewAuthenticatorServiceGRPC(projectRepo entity.ProjectRepository, accountRepo entity.AccountRepository, jwtMaker usecase.JWT) *AuthenticatorServiceGRPC {
+func NewAuthenticatorServiceGRPC(db repository.DocumentDB, cache repository.Cache, jwtMaker usecase.JWT) *AuthenticatorServiceGRPC {
 	return &AuthenticatorServiceGRPC{
-		projectRepository: projectRepo,
-		accountRepository: accountRepo,
-		jwtMaker:          jwtMaker,
+		db:       db,
+		cache:    cache,
+		jwtMaker: jwtMaker,
 	}
 }
 
@@ -30,7 +33,10 @@ func (s *AuthenticatorServiceGRPC) SignIn(ctx context.Context, in *pb.SigninRequ
 		Password:   in.Password,
 	}
 
-	processProcessAuthenticator := usecase.NewProcessAuthenticator(s.projectRepository, s.accountRepository, s.jwtMaker)
+	projectRepo := repository.NewProjectRepositoryDB(s.db, s.cache)
+	accountRepo := repository.NewAccountRepositoryDB(s.db, s.cache)
+
+	processProcessAuthenticator := usecase.NewProcessAuthenticator(projectRepo, accountRepo, s.jwtMaker)
 	output, err := processProcessAuthenticator.Sign(input)
 	if err != nil {
 		return &pb.SigninReply{
@@ -54,7 +60,10 @@ func (s *AuthenticatorServiceGRPC) VerifyToken(ctx context.Context, in *pb.Verif
 		ProjectId: in.ProjectId,
 	}
 
-	processProcessAuthenticator := usecase.NewProcessAuthenticator(s.projectRepository, s.accountRepository, s.jwtMaker)
+	projectRepo := repository.NewProjectRepositoryDB(s.db, s.cache)
+	accountRepo := repository.NewAccountRepositoryDB(s.db, s.cache)
+
+	processProcessAuthenticator := usecase.NewProcessAuthenticator(projectRepo, accountRepo, s.jwtMaker)
 	output, err := processProcessAuthenticator.VerifyToken(input)
 	if err != nil {
 		return &pb.VerifyTokenReply{

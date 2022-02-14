@@ -54,7 +54,7 @@ func (p *ProcessAccount) ExecuteCreateNewAccount(input AccountDtoInput) (*Accoun
 		return &AccountDtoOutput{}, err
 	}
 
-	err = account.SavePassword(input.Password, project.HashAlgoritm, project.RoudHash)
+	err = account.SavePassword(input.Password, project.HashAlgoritm, project.RoundHash)
 	if err != nil {
 		return &AccountDtoOutput{}, err
 	}
