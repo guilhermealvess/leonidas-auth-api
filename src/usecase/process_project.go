@@ -69,7 +69,7 @@ func (p *ProcessProject) createNewProject(project *entity.Project) (ProjectDtoOu
 		output := ProjectDtoOutput{
 			Error:      "",
 			Status:     201,
-			ID:         oid.String(),
+			ID:         oid.Hex(),
 			Credential: project.Credential,
 			Key:        project.Key,
 		}

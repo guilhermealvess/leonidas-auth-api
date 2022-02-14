@@ -4,8 +4,8 @@ import (
 	"api-auth/src/entity"
 	"encoding/json"
 
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const ACCOUNT = "accounts"
@@ -23,7 +23,7 @@ func NewAccountRepositoryDB(documentDB DocumentDB, cache Cache) *AccountReposito
 	}
 }
 
-func (repo *AccountRepositoryDB) FindByEmail(email string, projectId uuid.UUID) (*entity.Account, error) {
+func (repo *AccountRepositoryDB) FindByEmail(email string, projectId primitive.ObjectID) (*entity.Account, error) {
 	account := entity.NewAccount()
 	key := email + "-" + projectId.String()
 	dataString, err := repo.cache.Get(key)
@@ -46,14 +46,13 @@ func (repo *AccountRepositoryDB) FindByEmail(email string, projectId uuid.UUID) 
 	return account, nil
 }
 
-func (repo *AccountRepositoryDB) Insert(account entity.Account) (uuid.UUID, error) {
-	oid, err := repo.documentDB.InsertOne(ACCOUNT, account)
+func (repo *AccountRepositoryDB) Insert(account entity.Account) (primitive.ObjectID, error) {
+	account.ID = primitive.NewObjectID()
+	err := repo.documentDB.InsertOne(ACCOUNT, account)
 	if err == nil {
-		account.ID = oid
-
 		data, _ := json.Marshal(account)
 		key := account.Email + "-" + account.ProjectId.String()
 		repo.cache.Set(key, string(data))
 	}
-	return oid, err
+	return account.ID, err
 }

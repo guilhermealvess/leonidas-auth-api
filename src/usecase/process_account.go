@@ -54,6 +54,11 @@ func (p *ProcessAccount) ExecuteCreateNewAccount(input AccountDtoInput) (*Accoun
 		return &AccountDtoOutput{}, err
 	}
 
+	err = account.SavePassword(input.Password, project.HashAlgoritm, project.RoudHash)
+	if err != nil {
+		return &AccountDtoOutput{}, err
+	}
+
 	return p.createAccount(*account)
 }
 
@@ -68,7 +73,7 @@ func (p *ProcessAccount) createAccount(account entity.Account) (*AccountDtoOutpu
 		output := &AccountDtoOutput{
 			Error:  "",
 			Status: 201,
-			ID:     oid.String(),
+			ID:     oid.Hex(),
 		}
 
 		return output, nil

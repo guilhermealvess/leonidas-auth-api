@@ -12,7 +12,7 @@ type Payload struct {
 }
 
 type JWT interface {
-	CreateToken(payload Payload) (string, error)
+	CreateToken(payload Payload, secret string) (string, error)
 
-	Verify(token string) (*Payload, error)
+	Verify(token string, secret string) (*Payload, error)
 }

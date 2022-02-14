@@ -24,7 +24,8 @@ type ProcessSignOutput struct {
 }
 
 type ProcessVerifyTokenInput struct {
-	Token string
+	Token     string
+	ProjectId string
 }
 
 type ProcessVerifyTokenOutput struct {
@@ -64,7 +65,7 @@ func (p *ProcessAuthenticator) Sign(input ProcessSignInput) (*ProcessSignOutput,
 		Email:     account.Email,
 		IssuedAt:  time.Now(),
 		ExpiredAt: time.Now().Add(time.Duration(60)),
-	})
+	}, project.Secret)
 
 	if err != nil {
 		return &ProcessSignOutput{}, err
@@ -81,7 +82,8 @@ func (p *ProcessAuthenticator) Sign(input ProcessSignInput) (*ProcessSignOutput,
 }
 
 func (p *ProcessAuthenticator) VerifyToken(input ProcessVerifyTokenInput) (*ProcessVerifyTokenOutput, error) {
-	payload, err := p.jwtMaker.Verify(input.Token)
+	project, _ := p.ProjectRepository.FindByID(input.ProjectId)
+	payload, err := p.jwtMaker.Verify(input.Token, project.Secret)
 
 	if err != nil {
 		return &ProcessVerifyTokenOutput{

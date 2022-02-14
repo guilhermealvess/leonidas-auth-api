@@ -10,17 +10,17 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Account struct {
-	ID        uuid.UUID `bson:"_id,omitempty"`
-	ProjectId uuid.UUID `bson:"projectId,omitempty"`
-	Name      string    `bson:"name,omitempty"`
-	LastName  string    `bson:"lastName,omitempty"`
-	Email     string    `bson:"email,omitempty"`
-	Password  string    `bson:"password,omitempty"`
-	LastLogin string    `bson:"lastLogin,omitempty"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	ProjectId primitive.ObjectID `bson:"projectId,omitempty"`
+	Name      string             `bson:"name,omitempty"`
+	LastName  string             `bson:"lastName,omitempty"`
+	Email     string             `bson:"email,omitempty"`
+	Password  string             `bson:"password,omitempty"`
+	LastLogin string             `bson:"lastLogin,omitempty"`
 }
 
 func NewAccount() *Account {
@@ -58,8 +58,9 @@ func (a *Account) ValidEmail(email string) error {
 	return nil
 }
 
-func (a *Account) savePassword(password, algorithm string, rounds uint) error {
-	if algorithm != "SHA256" || algorithm != "SHA1" || algorithm != "SHA512" || algorithm != "MD5" {
+func (a *Account) SavePassword(password, algorithm string, rounds uint) error {
+	algorithm = strings.ToUpper(algorithm)
+	if algorithm != "SHA256" && algorithm != "SHA1" && algorithm != "SHA512" && algorithm != "MD5" {
 		return errors.New("Algorithm invalid")
 	}
 	for i := 0; uint(i) <= rounds; i++ {

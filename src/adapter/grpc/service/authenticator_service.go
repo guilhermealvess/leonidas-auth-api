@@ -50,7 +50,8 @@ func (s *AuthenticatorServiceGRPC) SignIn(ctx context.Context, in *pb.SigninRequ
 
 func (s *AuthenticatorServiceGRPC) VerifyToken(ctx context.Context, in *pb.VerifyTokenRequest) (*pb.VerifyTokenReply, error) {
 	input := usecase.ProcessVerifyTokenInput{
-		Token: in.Token,
+		Token:     in.Token,
+		ProjectId: in.ProjectId,
 	}
 
 	processProcessAuthenticator := usecase.NewProcessAuthenticator(s.projectRepository, s.accountRepository, s.jwtMaker)
