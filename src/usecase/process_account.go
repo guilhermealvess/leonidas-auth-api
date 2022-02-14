@@ -6,12 +6,12 @@ import (
 )
 
 type AccountDtoInput struct {
-	Credentials string
-	Key         string
-	Name        string
-	LastName    string
-	Email       string
-	Password    string
+	Credential string
+	Key        string
+	Name       string
+	LastName   string
+	Email      string
+	Password   string
 }
 
 type AccountDtoOutput struct {
@@ -35,9 +35,12 @@ func NewProcessAccount(repository entity.AccountRepository, projectRepository en
 func (p *ProcessAccount) ExecuteCreateNewAccount(input AccountDtoInput) (*AccountDtoOutput, error) {
 	account := entity.NewAccount()
 
-	project, err := p.projectRepository.FindByCredentials(input.Credentials)
+	project, err := p.projectRepository.FindByCredential(input.Credential)
 	if err != nil {
-		return &AccountDtoOutput{}, errors.New("Credentials invalid")
+		return &AccountDtoOutput{}, errors.New("Credential invalid")
+	}
+	if project.Key != input.Key {
+		return &AccountDtoOutput{}, errors.New("Credential invalid")
 	}
 
 	account.Name = input.Name
@@ -55,7 +58,7 @@ func (p *ProcessAccount) ExecuteCreateNewAccount(input AccountDtoInput) (*Accoun
 }
 
 func (p *ProcessAccount) createAccount(account entity.Account) (*AccountDtoOutput, error) {
-	_, err := p.Repository.FindByEmail(account.Email, account.ProjectId.String())
+	_, err := p.Repository.FindByEmail(account.Email, account.ProjectId)
 	if err == nil {
 		return &AccountDtoOutput{}, errors.New("Account not enable")
 	}

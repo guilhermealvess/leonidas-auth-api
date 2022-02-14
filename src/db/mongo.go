@@ -5,6 +5,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -23,14 +24,14 @@ func NewMongoDBInstance(client mongo.Client, database string) *MongoDB {
 	}
 }
 
-func (m *MongoDB) InsertOne(collectionName string, document interface{}) (primitive.ObjectID, error) {
+func (m *MongoDB) InsertOne(collectionName string, document interface{}) (uuid.UUID, error) {
 	coll := m.client.Database(m.database).Collection(collectionName)
 	//ctx := getContextWithTimeout(20)
 	result, insertResult := coll.InsertOne(context.TODO(), document)
 
 	oid := result.InsertedID.(primitive.ObjectID)
 
-	return oid, insertResult
+	return uuid.MustParse(oid.String()), insertResult
 }
 
 func (m *MongoDB) InsertMany() error {

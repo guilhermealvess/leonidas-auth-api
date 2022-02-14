@@ -1,21 +1,23 @@
 package entity
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"github.com/google/uuid"
+)
 
 type ProjectRepository interface {
-	Insert(project Project) (primitive.ObjectID, error)
+	Insert(project Project) (uuid.UUID, error)
 
-	FindByCredentials(credentials string) (*Project, error)
+	FindByCredential(credential string) (*Project, error)
 
 	FindByID(id string) error
 }
 
 type AccountRepository interface {
-	Insert(account Account) (primitive.ObjectID, error)
+	Insert(account Account) (uuid.UUID, error)
 
 	FindByID(id string) error
 
-	FindByEmail(email string, projectId string) (*Account, error)
+	FindByEmail(email string, projectId uuid.UUID) (*Account, error)
 
 	Update(account Account) error
 }

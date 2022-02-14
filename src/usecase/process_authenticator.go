@@ -41,8 +41,7 @@ func NewProcessAuthenticator(projectRepo entity.ProjectRepository, accountRepo e
 }
 
 func (p *ProcessAuthenticator) Sign(input ProcessSignInput) (*ProcessSignOutput, error) {
-	// Validar projeto
-	project, err := p.ProjectRepository.FindByCredentials(input.Credential)
+	project, err := p.ProjectRepository.FindByCredential(input.Credential)
 	if err != nil {
 		return &ProcessSignOutput{}, err
 	}
@@ -51,18 +50,15 @@ func (p *ProcessAuthenticator) Sign(input ProcessSignInput) (*ProcessSignOutput,
 		return &ProcessSignOutput{}, err
 	}
 
-	// Validar conta
-	account, err := p.AccountRepository.FindByEmail(input.Email, project.ID.String())
+	account, err := p.AccountRepository.FindByEmail(input.Email, project.ID)
 	if err != nil {
 		return &ProcessSignOutput{}, err
 	}
 
-	// Calcular Hash Password
 	if !account.VerifyPassword(input.Password, project.RoudHash, project.HashAlgoritm) {
 		return &ProcessSignOutput{}, err
 	}
 
-	// Gerar Token
 	tokenJWT, err := p.jwtMaker.CreateToken(Payload{
 		ID:        account.ID.String(),
 		Email:     account.Email,
@@ -74,13 +70,11 @@ func (p *ProcessAuthenticator) Sign(input ProcessSignInput) (*ProcessSignOutput,
 		return &ProcessSignOutput{}, err
 	}
 
-	// Registrar Login
 	account.LastLogin = time.Now().String()
 	if p.AccountRepository.Update(*account) != nil {
 		return &ProcessSignOutput{}, err
 	}
 
-	// Restornar Token
 	return &ProcessSignOutput{
 		Token: tokenJWT,
 	}, nil

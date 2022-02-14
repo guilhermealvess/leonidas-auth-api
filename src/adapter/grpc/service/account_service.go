@@ -26,12 +26,12 @@ func NewAccountServiceGRPC(db repository.DocumentDB, cache repository.Cache) *Ac
 
 func (s *AccountServiceGRPC) CreateAccount(ctx context.Context, in *pb.CreateAccounttRequest) (*pb.CreateAccountReply, error) {
 	input := usecase.AccountDtoInput{
-		Name:        in.Account.Name,
-		LastName:    in.Account.LastName,
-		Credentials: in.Credential,
-		Key:         in.Key,
-		Email:       in.Account.Email,
-		Password:    in.Account.Password,
+		Name:       in.Account.Name,
+		LastName:   in.Account.LastName,
+		Credential: in.Credential,
+		Key:        in.Key,
+		Email:      in.Account.Email,
+		Password:   in.Account.Password,
 	}
 
 	processAccount := usecase.NewProcessAccount(s.AccountRepository, s.ProjectRepository)

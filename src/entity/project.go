@@ -6,24 +6,24 @@ import (
 	"strings"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/google/uuid"
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 type Project struct {
-	Name         string             `json: name`
-	ID           primitive.ObjectID `json: _id`
-	Description  string             `json: description`
-	HashAlgoritm string             `json: hashAlgoritm`
-	RoudHash     uint               `json: roundHash`
-	Crendetials  string             `json: credentials`
-	Key          string             `json: key`
-	Secret       string             `json: secret`
-	CreatedBy    string             `json: createdBy`
-	CreatedAt    time.Time          `json: createdAt`
-	UpdatedBy    string             `json: updatedBy`
-	UpdatedAt    time.Time          `json: updatedAt`
+	Name         string    `bson:"name,omitempty"`
+	ID           uuid.UUID `bson:"_id,omitempty"`
+	Description  string    `bson:"description,omitempty"`
+	HashAlgoritm string    `bson:"hashAlgoritm,omitempty"`
+	RoudHash     uint      `bson:"roundHash,omitempty"`
+	Credential   string    `bson:"credential,omitempty"`
+	Key          string    `bson:"key,omitempty"`
+	Secret       string    `bson:"secret,omitempty"`
+	CreatedBy    string    `bson:"createdBy,omitempty"`
+	CreatedAt    time.Time `bson:"createdAt,omitempty"`
+	UpdatedBy    string    `bson:"updatedBy,omitempty"`
+	UpdatedAt    time.Time `bson:"updatedAt,omitempty"`
 }
 
 func NewProject() *Project {
@@ -36,10 +36,10 @@ func (p *Project) GenerateKey() string {
 }
 
 func (p *Project) GenerateCredential() string {
-	credentialsLegthPart := 32
-	firstPartCredentials := p.generateStringRandom(uint(credentialsLegthPart))
-	lastPartCredentials := p.generateStringRandom(uint(credentialsLegthPart))
-	return firstPartCredentials + "-" + lastPartCredentials
+	credentialLegthPart := 32
+	firstPartCredential := p.generateStringRandom(uint(credentialLegthPart))
+	lastPartCredential := p.generateStringRandom(uint(credentialLegthPart))
+	return firstPartCredential + "-" + lastPartCredential
 }
 
 func (p *Project) GenerateSecret() string {

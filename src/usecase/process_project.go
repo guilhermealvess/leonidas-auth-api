@@ -13,9 +13,11 @@ type ProjectDtoInput struct {
 }
 
 type ProjectDtoOutput struct {
-	Status int32
-	Error  string
-	ID     string
+	Status     int32
+	Error      string
+	ID         string
+	Credential string
+	Key        string
 }
 
 type ProcessProject struct {
@@ -44,11 +46,11 @@ func (p *ProcessProject) ExecuteCreateNewProject(projectInput ProjectDtoInput) (
 func (p *ProcessProject) createNewProject(project *entity.Project) (ProjectDtoOutput, error) {
 
 	for {
-		credentials := project.GenerateCredential()
-		_, err := p.Repository.FindByCredentials(credentials)
+		credential := project.GenerateCredential()
+		_, err := p.Repository.FindByCredential(credential)
 
 		if err != nil {
-			project.Crendetials = credentials
+			project.Credential = credential
 			break
 		}
 	}
@@ -65,17 +67,21 @@ func (p *ProcessProject) createNewProject(project *entity.Project) (ProjectDtoOu
 	oid, err := p.Repository.Insert(*project)
 	if err == nil {
 		output := ProjectDtoOutput{
-			Error:  "",
-			Status: 201,
-			ID:     oid.String(),
+			Error:      "",
+			Status:     201,
+			ID:         oid.String(),
+			Credential: project.Credential,
+			Key:        project.Key,
 		}
 
 		return output, nil
 	}
 
 	return ProjectDtoOutput{
-		Error:  "Não foi possivel criar um projeto",
-		Status: 500,
-		ID:     "",
+		Error:      "Não foi possivel criar um projeto",
+		Status:     500,
+		ID:         "",
+		Credential: "",
+		Key:        "",
 	}, err
 }

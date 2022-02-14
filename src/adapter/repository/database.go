@@ -3,6 +3,7 @@ package repository
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -17,7 +18,7 @@ type Cache interface {
 }
 
 type DocumentDB interface {
-	InsertOne(collectionName string, document interface{}) (primitive.ObjectID, error)
+	InsertOne(collectionName string, document interface{}) (uuid.UUID, error)
 
 	InsertMany() error
 

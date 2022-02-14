@@ -2,8 +2,8 @@
     {
         "name": "application",
         "description": "Application auth API JWT gRPC",
-        "credential": "SBxlxcZVXQZV-YpqihEw1DM4b",
-        "key": "SK9PF0W7R7NTCMB1NVKPEH8BP4WT0BGQ71HN8D1HRFYJEMQXVS",
+        "credential": "XVlBzgbaiCMRAjWwhTHctcuAxhxKQFDa-FpLSjFbcXoEFfRsWxPLDnJObCsNVlgTe",
+        "key": "MaPEZQleQYhYzRyWJjPjzpfRFEgmotaFetHsbZRjxAwnwekrBE",
         "hashAlgoritm": "sha1",
         "roundsHash": 1
     }

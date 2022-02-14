@@ -10,17 +10,17 @@ import (
 	"regexp"
 	"strings"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/google/uuid"
 )
 
 type Account struct {
-	ID        primitive.ObjectID `json: _id`
-	Name      string             `json: name`
-	LastName  string             `json: lastName`
-	Email     string             `json: email`
-	Password  string             `json: password`
-	LastLogin string             `json: lastLogin`
-	ProjectId primitive.ObjectID `json: projectId`
+	ID        uuid.UUID `bson:"_id,omitempty"`
+	ProjectId uuid.UUID `bson:"projectId,omitempty"`
+	Name      string    `bson:"name,omitempty"`
+	LastName  string    `bson:"lastName,omitempty"`
+	Email     string    `bson:"email,omitempty"`
+	Password  string    `bson:"password,omitempty"`
+	LastLogin string    `bson:"lastLogin,omitempty"`
 }
 
 func NewAccount() *Account {
@@ -51,7 +51,7 @@ func (a *Account) IsValid() error {
 func (a *Account) ValidEmail(email string) error {
 	valid := regexp.MustCompile(`/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/`)
 
-	if !valid.MatchString(email) {
+	if valid.MatchString(email) {
 		return errors.New("Email invalido")
 	}
 

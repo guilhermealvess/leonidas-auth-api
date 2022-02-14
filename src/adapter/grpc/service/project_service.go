@@ -37,5 +37,7 @@ func (s *ProjectServiceGRPC) CreateProject(ctx context.Context, in *pb.CreatePro
 		Error:      output.Error,
 		StatusCode: output.Status,
 		ProjectId:  output.ID,
+		Credential: output.Credential,
+		Key:        output.Key,
 	}, err
 }
