@@ -9,9 +9,12 @@ import (
 	"errors"
 	"regexp"
 	"strings"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+const PASSWORD_LENGTH = 8
 
 type Account struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
@@ -20,7 +23,7 @@ type Account struct {
 	LastName  string             `bson:"lastName,omitempty"`
 	Email     string             `bson:"email,omitempty"`
 	Password  string             `bson:"password,omitempty"`
-	LastLogin string             `bson:"lastLogin,omitempty"`
+	LastLogin time.Time          `bson:"lastLogin,omitempty"`
 }
 
 func NewAccount() *Account {
@@ -32,7 +35,7 @@ func (a *Account) IsValid() error {
 		return errors.New("Name and LastName is required")
 	}
 
-	if len(a.Password) < 8 {
+	if len(a.Password) < PASSWORD_LENGTH {
 		return errors.New("Password invalid")
 	}
 

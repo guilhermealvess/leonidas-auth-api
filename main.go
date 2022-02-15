@@ -3,6 +3,7 @@ package main
 import (
 	"api-auth/src/adapter/grpc/pb"
 	"api-auth/src/adapter/grpc/service"
+	"api-auth/src/adapter/jwt"
 	"api-auth/src/adapter/repository"
 	"api-auth/src/db"
 	"context"
@@ -54,10 +55,12 @@ func startGRPCServer(db repository.DocumentDB, cache repository.Cache) {
 
 	projectService := service.NewProjectServiceGRPC(db, cache)
 	accountService := service.NewAccountServiceGRPC(db, cache)
+	authenticatorService := service.NewAuthenticatorServiceGRPC(db, cache, jwt.NewJWTMaker())
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterProjectsServer(grpcServer, projectService)
 	pb.RegisterAccountServicesServer(grpcServer, accountService)
+	pb.RegisterAuthenticatorServer(grpcServer, authenticatorService)
 	reflection.Register(grpcServer)
 
 	if err := grpcServer.Serve(lis); err != nil {

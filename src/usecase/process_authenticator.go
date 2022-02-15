@@ -61,20 +61,20 @@ func (p *ProcessAuthenticator) Sign(input ProcessSignInput) (*ProcessSignOutput,
 	}
 
 	tokenJWT, err := p.jwtMaker.CreateToken(Payload{
-		ID:        account.ID.String(),
+		ID:        account.ID.Hex(),
 		Email:     account.Email,
 		IssuedAt:  time.Now(),
-		ExpiredAt: time.Now().Add(time.Duration(60)),
+		ExpiredAt: time.Now().Add(time.Duration(60 * time.Second)),
 	}, project.Secret)
 
 	if err != nil {
 		return &ProcessSignOutput{}, err
 	}
 
-	account.LastLogin = time.Now().String()
-	if p.AccountRepository.Update(*account) != nil {
+	account.LastLogin = time.Now()
+	/* if p.AccountRepository.Update(*account) != nil {
 		return &ProcessSignOutput{}, err
-	}
+	} */
 
 	return &ProcessSignOutput{
 		Token: tokenJWT,

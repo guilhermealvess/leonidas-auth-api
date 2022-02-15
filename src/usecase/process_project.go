@@ -3,13 +3,15 @@ package usecase
 import (
 	"api-auth/src/entity"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ProjectDtoInput struct {
-	Description  string
-	HashAlgoritm string
-	Name         string
-	RoundHash    uint
+	Description   string
+	HashAlgorithm string
+	Name          string
+	RoundHash     uint
 }
 
 type ProjectDtoOutput struct {
@@ -31,7 +33,7 @@ func NewProcessProject(repo entity.ProjectRepository) *ProcessProject {
 func (p *ProcessProject) ExecuteCreateNewProject(projectInput ProjectDtoInput) (ProjectDtoOutput, error) {
 	project := entity.NewProject()
 	project.Description = projectInput.Description
-	project.HashAlgoritm = projectInput.HashAlgoritm
+	project.HashAlgoritm = projectInput.HashAlgorithm
 	project.Name = projectInput.Name
 	project.RoundHash = projectInput.RoundHash
 
@@ -47,9 +49,9 @@ func (p *ProcessProject) createNewProject(project *entity.Project) (ProjectDtoOu
 
 	for {
 		credential := project.GenerateCredential()
-		_, err := p.Repository.FindByCredential(credential)
+		projectFromDB, _ := p.Repository.FindByCredential(credential)
 
-		if err != nil {
+		if projectFromDB.ID == primitive.NilObjectID {
 			project.Credential = credential
 			break
 		}

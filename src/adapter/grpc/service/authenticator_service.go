@@ -12,9 +12,6 @@ type AuthenticatorServiceGRPC struct {
 	db       repository.DocumentDB
 	cache    repository.Cache
 	jwtMaker usecase.JWT
-
-	//projectRepository entity.ProjectRepository
-	//accountRepository entity.AccountRepository
 }
 
 func NewAuthenticatorServiceGRPC(db repository.DocumentDB, cache repository.Cache, jwtMaker usecase.JWT) *AuthenticatorServiceGRPC {

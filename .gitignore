@@ -4,3 +4,4 @@ venv/
 
 auth
 example.go
+client/

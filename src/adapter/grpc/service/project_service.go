@@ -23,10 +23,10 @@ func NewProjectServiceGRPC(db repository.DocumentDB, cache repository.Cache) *Pr
 
 func (s *ProjectServiceGRPC) CreateProject(ctx context.Context, in *pb.CreateProjectRequest) (*pb.CreateProjectReply, error) {
 	input := usecase.ProjectDtoInput{
-		Name:         in.Project.Name,
-		Description:  in.Project.Description,
-		HashAlgoritm: in.Project.HashAlgoritm,
-		RoundHash:    uint(in.Project.RoundHash),
+		Name:          in.Project.Name,
+		Description:   in.Project.Description,
+		HashAlgorithm: in.Project.HashAlgorithm,
+		RoundHash:     uint(in.Project.RoundHash),
 	}
 
 	processProject := usecase.NewProcessProject(s.Repository)
