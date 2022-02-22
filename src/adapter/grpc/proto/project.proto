@@ -14,8 +14,8 @@ message CreateProjectRequest {
 }
 
 message CreateProjectReply {
-    string error = 1;
-    int32 statusCode = 2;
+    bool success = 1;
+    string error = 2;
     string projectId = 3;
     string credential = 4;
     string key = 5;

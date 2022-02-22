@@ -15,7 +15,7 @@ type ProjectDtoInput struct {
 }
 
 type ProjectDtoOutput struct {
-	Status     int32
+	Success    bool
 	Error      string
 	ID         string
 	Credential string
@@ -70,7 +70,7 @@ func (p *ProcessProject) createNewProject(project *entity.Project) (ProjectDtoOu
 	if err == nil {
 		output := ProjectDtoOutput{
 			Error:      "",
-			Status:     201,
+			Success:    true,
 			ID:         oid.Hex(),
 			Credential: project.Credential,
 			Key:        project.Key,
@@ -81,7 +81,7 @@ func (p *ProcessProject) createNewProject(project *entity.Project) (ProjectDtoOu
 
 	return ProjectDtoOutput{
 		Error:      "Não foi possivel criar um projeto",
-		Status:     500,
+		Success:    false,
 		ID:         "",
 		Credential: "",
 		Key:        "",

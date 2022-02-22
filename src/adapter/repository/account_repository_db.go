@@ -3,6 +3,7 @@ package repository
 import (
 	"api-auth/src/entity"
 	"encoding/json"
+	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -24,6 +25,7 @@ func NewAccountRepositoryDB(documentDB DocumentDB, cache Cache) *AccountReposito
 }
 
 func (repo *AccountRepositoryDB) FindByEmail(email string, projectId primitive.ObjectID) (*entity.Account, error) {
+	log.Println("FindByEmail, email: %s, projectId: %s", email, projectId)
 	account := entity.NewAccount()
 	key := email + "-" + projectId.String()
 	dataString, err := repo.cache.Get(key)

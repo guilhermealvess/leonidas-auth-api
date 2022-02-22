@@ -15,9 +15,9 @@ type AccountDtoInput struct {
 }
 
 type AccountDtoOutput struct {
-	Status int32
-	Error  string
-	ID     string
+	Success bool
+	Error   string
+	ID      string
 }
 
 type ProcessAccount struct {
@@ -51,12 +51,20 @@ func (p *ProcessAccount) ExecuteCreateNewAccount(input AccountDtoInput) (*Accoun
 
 	err = account.IsValid()
 	if err != nil {
-		return &AccountDtoOutput{}, err
+		return &AccountDtoOutput{
+			Success: false,
+			Error:   err.Error(),
+			ID:      "",
+		}, err
 	}
 
 	err = account.SavePassword(input.Password, project.HashAlgoritm, project.RoundHash)
 	if err != nil {
-		return &AccountDtoOutput{}, err
+		return &AccountDtoOutput{
+			Success: false,
+			Error:   err.Error(),
+			ID:      "",
+		}, err
 	}
 
 	return p.createAccount(*account)
@@ -69,19 +77,20 @@ func (p *ProcessAccount) createAccount(account entity.Account) (*AccountDtoOutpu
 	}
 
 	oid, err := p.Repository.Insert(account)
+
 	if err == nil {
 		output := &AccountDtoOutput{
-			Error:  "",
-			Status: 201,
-			ID:     oid.Hex(),
+			Error:   "",
+			Success: true,
+			ID:      oid.Hex(),
 		}
 
 		return output, nil
 	}
 
 	return &AccountDtoOutput{
-		Error:  "Não foi possivel criar uma conta",
-		Status: 500,
-		ID:     "",
+		Error:   "Não foi possivel criar uma conta",
+		Success: false,
+		ID:      "",
 	}, err
 }

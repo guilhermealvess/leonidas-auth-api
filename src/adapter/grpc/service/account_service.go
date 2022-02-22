@@ -38,8 +38,8 @@ func (s *AccountServiceGRPC) CreateAccount(ctx context.Context, in *pb.CreateAcc
 	output, err := processAccount.ExecuteCreateNewAccount(input)
 
 	return &pb.CreateAccountReply{
-		Error:      output.Error,
-		StatusCode: output.Status,
-		AccountId:  output.ID,
+		Error:     output.Error,
+		Success:   output.Success,
+		AccountId: output.ID,
 	}, err
 }

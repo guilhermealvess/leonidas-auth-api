@@ -38,14 +38,12 @@ func (s *AuthenticatorServiceGRPC) SignIn(ctx context.Context, in *pb.SigninRequ
 	if err != nil {
 		return &pb.SigninReply{
 			Error:      "",
-			StatusCode: 500,
 			Token:      "",
 		}, err
 	}
 
 	return &pb.SigninReply{
 		Error:      "200",
-		StatusCode: 200,
 		Token:      output.Token,
 	}, nil
 
@@ -65,14 +63,12 @@ func (s *AuthenticatorServiceGRPC) VerifyToken(ctx context.Context, in *pb.Verif
 	if err != nil {
 		return &pb.VerifyTokenReply{
 			Error:      err.Error(),
-			StatusCode: 500,
 			Payload:    &pb.Payload{},
 		}, err
 	}
 
 	return &pb.VerifyTokenReply{
 		Error:      "",
-		StatusCode: 200,
 		Payload: &pb.Payload{
 			Id:        output.Payload.ID,
 			Email:     output.Payload.Email,

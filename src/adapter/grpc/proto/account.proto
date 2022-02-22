@@ -16,8 +16,8 @@ message CreateAccounttRequest {
 }
 
 message CreateAccountReply {
-    string error = 1;
-    int32 statusCode = 2;
+    bool success = 1;
+    string error = 2;
     string accountId = 3;
 }
 

@@ -10,8 +10,8 @@ message SigninRequest {
 }
 
 message SigninReply {
-    string error = 1;
-    int32 statusCode = 2;
+    bool success = 1;
+    string error = 2;
     string token = 3;
 }
 
@@ -28,8 +28,8 @@ message Payload {
 }
 
 message VerifyTokenReply {
-    string error = 1;
-    int32 statusCode = 2;
+    bool success = 1;
+    string error = 2;
     Payload Payload = 3;
 }
 
@@ -38,8 +38,8 @@ message RefreshTokenRequest {
 }
 
 message RefreshTokenReply {
-    string error = 1;
-    int32 statusCode = 2;
+    bool success = 1;
+    string error = 2;
     string token = 3;
 }
 
