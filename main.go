@@ -53,11 +53,13 @@ func startGRPCServer(db repository.DocumentDB, cache repository.Cache) {
 
 	log.Println("START GRPC SERVE ON PORT " + os.Getenv("GRPC_PORT"))
 
+	pingService := service.NewPingService()
 	projectService := service.NewProjectServiceGRPC(db, cache)
 	accountService := service.NewAccountServiceGRPC(db, cache)
 	authenticatorService := service.NewAuthenticatorServiceGRPC(db, cache, jwt.NewJWTMaker())
 
 	grpcServer := grpc.NewServer()
+	pb.RegisterHelloServer(grpcServer, pingService)
 	pb.RegisterProjectsServer(grpcServer, projectService)
 	pb.RegisterAccountServicesServer(grpcServer, accountService)
 	pb.RegisterAuthenticatorServer(grpcServer, authenticatorService)

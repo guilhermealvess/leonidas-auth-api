@@ -5,10 +5,14 @@ import (
 	"context"
 )
 
-type Ping struct {
+type PingService struct {
 	pb.UnimplementedHelloServer
 }
 
-func (p *Ping) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	return &pb.HelloReply{Hello: "hello"}, nil
+func (p *PingService) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+	return &pb.HelloReply{Hello: "Hello" + in.Hello}, nil
+}
+
+func NewPingService() *PingService {
+	return &PingService{}
 }
