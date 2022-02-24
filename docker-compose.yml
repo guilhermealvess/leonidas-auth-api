@@ -14,3 +14,14 @@ services:
     restart: always
     ports:
       - 6378:6379
+
+  app:
+    build: .
+    ports:
+      - 50052:50052
+    links:
+      - mongo
+      - redis
+    environment:
+      MONGO_HOST: mongo
+      REDIS_HOST: redis
