@@ -7,8 +7,8 @@ COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
 COPY . .
+RUN . execute-tests.sh
 RUN go build -o /usr/local/bin/app
-RUN go test
 
 COPY .env /usr/local/bin/.env
 

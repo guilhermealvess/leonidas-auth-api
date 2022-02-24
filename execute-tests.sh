@@ -1,0 +1,1 @@
+go test test/entity/*.go
