@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"api-auth/src/entity"
+	"math"
 	"time"
 )
 
@@ -29,7 +30,6 @@ type ProcessVerifyTokenInput struct {
 }
 
 type ProcessVerifyTokenOutput struct {
-	Eror    string
 	Payload Payload
 }
 
@@ -64,7 +64,7 @@ func (p *ProcessAuthenticator) Sign(input ProcessSignInput) (*ProcessSignOutput,
 		ID:        account.ID.Hex(),
 		Email:     account.Email,
 		IssuedAt:  time.Now(),
-		ExpiredAt: time.Now().Add(time.Duration(60 * time.Second)),
+		ExpiredAt: time.Now().Add(time.Duration(60 * 60 * math.Pow(10, 9))),
 	}, project.Secret)
 
 	if err != nil {
@@ -85,15 +85,7 @@ func (p *ProcessAuthenticator) VerifyToken(input ProcessVerifyTokenInput) (*Proc
 	project, _ := p.ProjectRepository.FindByID(input.ProjectId)
 	payload, err := p.jwtMaker.Verify(input.Token, project.Secret)
 
-	if err != nil {
-		return &ProcessVerifyTokenOutput{
-			Eror:    err.Error(),
-			Payload: *payload,
-		}, err
-	}
-
 	return &ProcessVerifyTokenOutput{
-		Eror:    "",
 		Payload: *payload,
-	}, nil
+	}, err
 }

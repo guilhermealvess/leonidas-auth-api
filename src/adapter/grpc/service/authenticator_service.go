@@ -37,14 +37,16 @@ func (s *AuthenticatorServiceGRPC) SignIn(ctx context.Context, in *pb.SigninRequ
 	output, err := processProcessAuthenticator.Sign(input)
 	if err != nil {
 		return &pb.SigninReply{
-			Error:      "",
-			Token:      "",
+			Success: false,
+			Error:   err.Error(),
+			Token:   "",
 		}, err
 	}
 
 	return &pb.SigninReply{
-		Error:      "200",
-		Token:      output.Token,
+		Success: true,
+		Token:   output.Token,
+		Error:   "",
 	}, nil
 
 }
@@ -62,13 +64,15 @@ func (s *AuthenticatorServiceGRPC) VerifyToken(ctx context.Context, in *pb.Verif
 	output, err := processProcessAuthenticator.VerifyToken(input)
 	if err != nil {
 		return &pb.VerifyTokenReply{
-			Error:      err.Error(),
-			Payload:    &pb.Payload{},
-		}, err
+			Success: false,
+			Error:   err.Error(),
+			Payload: &pb.Payload{},
+		}, nil
 	}
 
 	return &pb.VerifyTokenReply{
-		Error:      "",
+		Success: true,
+		Error: "",
 		Payload: &pb.Payload{
 			Id:        output.Payload.ID,
 			Email:     output.Payload.Email,

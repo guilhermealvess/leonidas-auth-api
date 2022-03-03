@@ -34,7 +34,8 @@ func (j *JWTMaker) Verify(tokenJWT string, secret string) (*usecase.Payload, err
 	payload := &usecase.Payload{}
 	claims.ToStruct(payload)
 
-	if time.Now().After(payload.ExpiredAt) {
+	now := time.Now()
+	if now.After(payload.ExpiredAt) {
 		return payload, errors.New("TOKEN EXPIRADO")
 	}
 
