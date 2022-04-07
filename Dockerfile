@@ -1,17 +1,18 @@
-FROM golang:1.17
+FROM golang:1.18
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
-COPY go.mod go.sum ./
-RUN go mod download && go mod verify
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
 
-COPY . .
-RUN . execute-tests.sh
-RUN go build -o /usr/local/bin/app
+COPY . ./
 
-COPY .env /usr/local/bin/.env
+RUN sh execute-tests.sh
 
+RUN go build -o /server
+
+EXPOSE 8000
 EXPOSE 50052
 
-CMD ["app"]
+CMD [ "/server" ]
