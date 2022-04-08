@@ -8,10 +8,9 @@ import (
 
 func (s *ApiServerServices) SignIn(ctx context.Context, in *pb.SigninRequest) (*pb.SigninReply, error) {
 	input := usecase.ProcessSignInput{
-		Credential: in.Credential,
-		Key:        in.Key,
-		Email:      in.Email,
-		Password:   in.Password,
+		ApiKey:   in.ApiKey,
+		Email:    in.Email,
+		Password: in.Password,
 	}
 
 	processProcessAuthenticator := usecase.NewProcessAuthenticator(s.ProjectRepository, s.AccountRepository, s.jwtMaker)

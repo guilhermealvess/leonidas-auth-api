@@ -14,10 +14,9 @@ type ProcessAuthenticator struct {
 }
 
 type ProcessSignInput struct {
-	Credential string
-	Key        string
-	Email      string
-	Password   string
+	ApiKey   string
+	Email    string
+	Password string
 }
 
 type ProcessSignOutput struct {
@@ -43,12 +42,9 @@ func NewProcessAuthenticator(projectRepo entity.ProjectRepository, accountRepo e
 }
 
 func (p *ProcessAuthenticator) Sign(input ProcessSignInput) (*ProcessSignOutput, error) {
-	project, err := p.ProjectRepository.FindByCredential(input.Credential)
-	if err != nil {
-		return &ProcessSignOutput{}, err
-	}
+	project, err := p.ProjectRepository.FindByApiKey(input.ApiKey)
 
-	if project.Key != input.Key {
+	if err != nil {
 		return &ProcessSignOutput{}, err
 	}
 

@@ -28,22 +28,22 @@ func (p *ProjectRepositoryDB) Insert(project entity.Project) (primitive.ObjectID
 	err := p.documentDB.InsertOne(PROJECTS, project)
 	if err == nil {
 		data, _ := json.Marshal(project)
-		p.cache.Set(project.Credential, string(data))
+		p.cache.Set(project.ApiKey, string(data))
 	}
 	return project.ID, err
 }
 
-func (p *ProjectRepositoryDB) FindByCredential(credential string) (*entity.Project, error) {
+func (p *ProjectRepositoryDB) FindByCredential(apiKey string) (*entity.Project, error) {
 	newProject := entity.NewProject()
-	dataString, err := p.cache.Get(credential)
+	dataString, err := p.cache.Get(apiKey)
 	if err != nil || dataString == "" {
-		data, errorDB := p.documentDB.FindOne(PROJECTS, bson.D{{"credential", credential}})
+		data, errorDB := p.documentDB.FindOne(PROJECTS, bson.D{{"apiKey", apiKey}})
 
 		if errorDB != nil {
 			return &entity.Project{}, errorDB
 		}
 		dataByte, _ := json.Marshal(data)
-		p.cache.Set(credential, string(dataByte))
+		p.cache.Set(apiKey, string(dataByte))
 
 		j, _ := json.Marshal(data)
 		json.Unmarshal(j, newProject)

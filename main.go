@@ -77,7 +77,7 @@ func startHttpServer(db repository.DocumentDB, cache repository.Cache) {
 
 	accountController := rest.NewAccountController(db, cache)
 
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "OK") })
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "OK\n") })
 	router.HandleFunc("/account/activation-link", accountController.ActivationAccount).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":"+port, router))

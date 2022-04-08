@@ -27,9 +27,8 @@ message Account {
 
 message CreateAccounttRequest {
     Account account = 1;
-    string credential = 2;
-    string key = 3;
-    string urlRedirectActivation = 4;
+    string urlRedirectActivation = 2;
+    string apiKey = 3;
 }
 
 message CreateAccountReply {
@@ -52,8 +51,7 @@ message RefreshActivationLinkAccountResponse {
 message SigninRequest {
     string email = 1;
     string password = 2;
-    string credential = 3;
-    string key = 4;
+    string apiKey = 3;
 }
 
 message SigninReply {
@@ -112,7 +110,5 @@ message CreateProjectRequest {
 message CreateProjectReply {
     bool success = 1;
     string error = 2;
-    string projectId = 3;
-    string credential = 4;
-    string key = 5;
+    string apiKey = 3;
 }

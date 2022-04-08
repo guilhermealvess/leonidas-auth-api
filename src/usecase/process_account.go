@@ -9,8 +9,7 @@ import (
 )
 
 type AccountDtoInput struct {
-	Credential            string
-	Key                   string
+	ApiKey                string
 	Name                  string
 	LastName              string
 	Email                 string
@@ -48,11 +47,9 @@ func NewProcessAccount(repository entity.AccountRepository, projectRepository en
 func (p *ProcessAccount) ExecuteCreateNewAccount(input AccountDtoInput) (*AccountDtoOutput, error) {
 	account := entity.NewAccount()
 
-	project, err := p.projectRepository.FindByCredential(input.Credential)
+	project, err := p.projectRepository.FindByApiKey(input.ApiKey)
+	
 	if err != nil {
-		return &AccountDtoOutput{}, errors.New("Credential invalid")
-	}
-	if project.Key != input.Key {
 		return &AccountDtoOutput{}, errors.New("Credential invalid")
 	}
 
@@ -172,7 +169,6 @@ func activateAccountFail(err error) *ActivationAccountDtoOutput {
 		Url:     "",
 	}
 }
-
 
 func (p *ProcessAccount) RefreshActivationLinkAccount(id string) (string, error) {
 	account, err := p.Repository.FindByID(id)

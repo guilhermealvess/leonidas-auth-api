@@ -19,10 +19,8 @@ func (s *ApiServerServices) CreateProject(ctx context.Context, in *pb.CreateProj
 	output, err := processProject.ExecuteCreateNewProject(input)
 
 	return &pb.CreateProjectReply{
-		Error:      output.Error,
-		Success:    output.Success,
-		ProjectId:  output.ID,
-		Credential: output.Credential,
-		Key:        output.Key,
+		Error:   output.Error,
+		Success: output.Success,
+		ApiKey:  output.ApiKey,
 	}, err
 }

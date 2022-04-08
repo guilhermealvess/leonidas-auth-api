@@ -10,8 +10,7 @@ func (s *ApiServerServices) CreateAccount(ctx context.Context, in *pb.CreateAcco
 	input := usecase.AccountDtoInput{
 		Name:                  in.Account.Name,
 		LastName:              in.Account.LastName,
-		Credential:            in.Credential,
-		Key:                   in.Key,
+		ApiKey:                in.ApiKey,
 		Email:                 in.Account.Email,
 		Password:              in.Account.Password,
 		UrlRedirectActivation: in.UrlRedirectActivation,

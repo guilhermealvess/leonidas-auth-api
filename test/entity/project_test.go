@@ -4,19 +4,20 @@ import (
 	"api-auth/src/entity"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func TestValidProject(t *testing.T) {
 	project := &entity.Project{
-		Name: "Leonidas",
-		Description: "Leonidas Marketplace",
-		RoundHash: 8,
-		Key: "255e5f3f-c8d0-5c96-8cf5-3eac80facb60",
-		Credential: "fgPyCKmxIubeYTNDtjAyRRDedMiyLpru-cjiOgjhYeVwBTCMLfrDGXqwpzwVGqMZc",
-		Secret: "jxzuaiIsNBakqSwQpOQgNczgaczAInLq",
+		Name:         "Leonidas",
+		Description:  "Leonidas Marketplace",
+		RoundHash:    8,
+		ApiKey:       uuid.NewString(),
+		Secret:       "jxzuaiIsNBakqSwQpOQgNczgaczAInLq",
 		HashAlgoritm: "sha1",
-		CreatedBy: "SYSTEM",
-		CreatedAt: time.Now(),
+		CreatedBy:    "SYSTEM",
+		CreatedAt:    time.Now(),
 	}
 
 	if project.IsValid() != nil {

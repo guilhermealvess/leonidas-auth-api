@@ -3,8 +3,6 @@ package usecase
 import (
 	"api-auth/src/entity"
 	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ProjectDtoInput struct {
@@ -15,11 +13,9 @@ type ProjectDtoInput struct {
 }
 
 type ProjectDtoOutput struct {
-	Success    bool
-	Error      string
-	ID         string
-	Credential string
-	Key        string
+	Success bool
+	Error   string
+	ApiKey  string
 }
 
 type ProcessProject struct {
@@ -47,43 +43,25 @@ func (p *ProcessProject) ExecuteCreateNewProject(projectInput ProjectDtoInput) (
 
 func (p *ProcessProject) createNewProject(project *entity.Project) (ProjectDtoOutput, error) {
 
-	for {
-		credential := project.GenerateCredential()
-		projectFromDB, _ := p.Repository.FindByCredential(credential)
-
-		if projectFromDB.ID == primitive.NilObjectID {
-			project.Credential = credential
-			break
-		}
-	}
-
-	key := project.GenerateKey()
-	project.Key = key
-
-	secret := project.GenerateSecret()
-	project.Secret = secret
-
+	apiKey := project.GenerateApiKey()
+	project.Secret = project.GenerateSecret()
 	project.CreatedAt = time.Now()
 	project.CreatedBy = "SYSTEM"
 
-	oid, err := p.Repository.Insert(*project)
+	_, err := p.Repository.Insert(*project)
 	if err == nil {
 		output := ProjectDtoOutput{
-			Error:      "",
-			Success:    true,
-			ID:         oid.Hex(),
-			Credential: project.Credential,
-			Key:        project.Key,
+			Success: true,
+			Error:   "",
+			ApiKey:  apiKey,
 		}
 
 		return output, nil
 	}
 
 	return ProjectDtoOutput{
-		Error:      "Não foi possivel criar um projeto",
-		Success:    false,
-		ID:         "",
-		Credential: "",
-		Key:        "",
+		Success: false,
+		Error:   "Não foi possivel criar um projeto",
+		ApiKey:  "",
 	}, err
 }

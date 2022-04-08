@@ -7,7 +7,7 @@ import (
 type ProjectRepository interface {
 	Insert(project Project) (primitive.ObjectID, error)
 
-	FindByCredential(credential string) (*Project, error)
+	FindByApiKey(apiKey string) (*Project, error)
 
 	FindByID(id string) (*Project, error)
 }

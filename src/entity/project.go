@@ -2,7 +2,6 @@ package entity
 
 import (
 	"errors"
-	"math/rand"
 	"strings"
 	"time"
 
@@ -11,11 +10,11 @@ import (
 )
 
 const (
-	alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	ROUND_LIMIT = 60
-	secretLength = 32
+	alphabet            = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	ROUND_LIMIT         = 60
+	secretLength        = 32
 	credentialLegthPart = 32
-	keyLegth = 50
+	keyLegth            = 50
 )
 
 type Project struct {
@@ -24,8 +23,7 @@ type Project struct {
 	Description  string             `bson:"description,omitempty"`
 	HashAlgoritm string             `bson:"hashAlgoritm,omitempty"`
 	RoundHash    uint               `bson:"roundHash,omitempty"`
-	Credential   string             `bson:"credential,omitempty"`
-	Key          string             `bson:"key,omitempty"`
+	ApiKey       string             `bson:"apiKey,omitempty"`
 	Secret       string             `bson:"secret,omitempty"`
 	CreatedBy    string             `bson:"createdBy,omitempty"`
 	CreatedAt    time.Time          `bson:"createdAt,omitempty"`
@@ -37,31 +35,12 @@ func NewProject() *Project {
 	return &Project{}
 }
 
-func (p *Project) GenerateKey() string {
-	uid, _ := uuid.NewUUID()
-	key := uuid.NewSHA1(uid, []byte(p.generateStringRandom(uint(keyLegth))))
-	return key.String()
-}
-
-func (p *Project) GenerateCredential() string {
-	firstPartCredential := p.generateStringRandom(uint(credentialLegthPart))
-	lastPartCredential := p.generateStringRandom(uint(credentialLegthPart))
-	return firstPartCredential + "-" + lastPartCredential
+func (p *Project) GenerateApiKey() string {
+	return uuid.NewString()
 }
 
 func (p *Project) GenerateSecret() string {
-	return p.generateStringRandom(uint(secretLength))
-}
-
-func (p *Project) generateStringRandom(length uint) string {
-	var letterRunes = []rune(alphabet)
-
-	b := make([]rune, length)
-	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
-	}
-
-	return string(b)
+	return uuid.NewString()
 }
 
 func (p *Project) IsValid() error {
