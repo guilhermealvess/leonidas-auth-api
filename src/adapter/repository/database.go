@@ -25,7 +25,7 @@ type DocumentDB interface {
 
 	FindByID(id string) error
 
-	UpdateOne() error
+	UpdateOne(collectionName string, id primitive.ObjectID, documentFields primitive.D) error
 
 	UpdateMany() error
 

@@ -70,7 +70,7 @@ The following tools were used in this project:
 - [Docker](https://www.docker.com/)
 ## :white_check_mark: Requirements ##
 
-Before starting :checkered_flag:, you need to have [Git](https://git-scm.com) and [Go](https://go.dev/) installed.
+Before starting :checkered_flag:, you need to have [Git](https://git-scm.com) and [Go 1.18](https://go.dev/) installed.
 
 ## :checkered_flag: Starting ##
 

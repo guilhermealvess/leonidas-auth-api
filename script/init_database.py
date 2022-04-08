@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import bson
 from dotenv import load_dotenv
 import os, json
 
@@ -20,6 +21,8 @@ files = set(filter(lambda f: f.endswith('.json'), files))
 for f in files:
     filename = os.path.join(PATH, f)
     collection = f.split('.')[0]
-    doc = json.loads(open(filename).read())
+    docs = json.loads(open(filename).read())
+    for doc in docs:
+        doc["_id"] = bson.ObjectId(doc["_id"])
     
-    db[collection].insert_many(doc)
+    db[collection].insert_many(docs)

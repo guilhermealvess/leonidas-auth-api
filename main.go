@@ -5,13 +5,17 @@ import (
 	"api-auth/src/adapter/grpc/service"
 	"api-auth/src/adapter/jwt"
 	"api-auth/src/adapter/repository"
+	"api-auth/src/adapter/rest"
 	"api-auth/src/db"
 	"context"
+	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -41,31 +45,40 @@ func main() {
 	redisCache := db.NewCacheRedisInstance(*rdb)
 	mongoDB := db.NewMongoDBInstance(*mongoClient, database)
 
+	go startHttpServer(mongoDB, redisCache)
+
 	startGRPCServer(mongoDB, redisCache)
 }
 
 func startGRPCServer(db repository.DocumentDB, cache repository.Cache) {
-	lis, err := net.Listen("tcp", "localhost:"+os.Getenv("GRPC_PORT"))
+	port := os.Getenv("GRPC_PORT")
+	lis, err := net.Listen("tcp", "localhost:"+port)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("START GRPC SERVE ON PORT " + os.Getenv("GRPC_PORT"))
-
-	pingService := service.NewPingService()
-	projectService := service.NewProjectServiceGRPC(db, cache)
-	accountService := service.NewAccountServiceGRPC(db, cache)
-	authenticatorService := service.NewAuthenticatorServiceGRPC(db, cache, jwt.NewJWTMaker())
+	log.Println("START GRPC SERVE ON PORT " + port)
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterHelloServer(grpcServer, pingService)
-	pb.RegisterProjectsServer(grpcServer, projectService)
-	pb.RegisterAccountServicesServer(grpcServer, accountService)
-	pb.RegisterAuthenticatorServer(grpcServer, authenticatorService)
+	services := service.NewAccountServiceGRPC(db, cache, jwt.NewJWTMaker())
+	pb.RegisterApiV1ServicesServer(grpcServer, services)
 	reflection.Register(grpcServer)
 
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func startHttpServer(db repository.DocumentDB, cache repository.Cache) {
+	port := os.Getenv("HTTP_SERVER_PORT")
+	log.Println("START HTTP SERVE ON PORT " + port)
+	router := mux.NewRouter()
+
+	accountController := rest.NewAccountController(db, cache)
+
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "OK") })
+	router.HandleFunc("/account/activation-link", accountController.ActivationAccount).Methods("GET")
+
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }

@@ -1,8 +1,6 @@
 [
     {
-        "_id": {
-            "$oid": "621fa649aa2a640cfa7c6c7c"
-        },
+        "_id": "621fa649aa2a640cfa7c6c7c",
         "name": "Leonidas",
         "description": "leonidas marktplace",
         "hashAlgoritm": "sha1",

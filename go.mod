@@ -1,11 +1,12 @@
 module api-auth
 
-go 1.17
+go 1.18
 
 require (
 	github.com/brianvoe/sjwt v0.5.1
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/google/uuid v1.3.0
+	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.4.0
 	go.mongodb.org/mongo-driver v1.8.2
 	google.golang.org/grpc v1.44.0

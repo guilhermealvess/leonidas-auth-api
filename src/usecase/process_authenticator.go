@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"api-auth/src/adapter/jwt"
 	"api-auth/src/entity"
 	"math"
 	"time"
@@ -9,7 +10,7 @@ import (
 type ProcessAuthenticator struct {
 	ProjectRepository entity.ProjectRepository
 	AccountRepository entity.AccountRepository
-	jwtMaker          JWT
+	jwtMaker          jwt.JWT
 }
 
 type ProcessSignInput struct {
@@ -30,10 +31,10 @@ type ProcessVerifyTokenInput struct {
 }
 
 type ProcessVerifyTokenOutput struct {
-	Payload Payload
+	Payload jwt.Payload
 }
 
-func NewProcessAuthenticator(projectRepo entity.ProjectRepository, accountRepo entity.AccountRepository, jwtMaker JWT) *ProcessAuthenticator {
+func NewProcessAuthenticator(projectRepo entity.ProjectRepository, accountRepo entity.AccountRepository, jwtMaker jwt.JWT) *ProcessAuthenticator {
 	return &ProcessAuthenticator{
 		ProjectRepository: projectRepo,
 		AccountRepository: accountRepo,
@@ -60,7 +61,7 @@ func (p *ProcessAuthenticator) Sign(input ProcessSignInput) (*ProcessSignOutput,
 		return &ProcessSignOutput{}, err
 	}
 
-	tokenJWT, err := p.jwtMaker.CreateToken(Payload{
+	tokenJWT, err := p.jwtMaker.CreateToken(jwt.Payload{
 		ID:        account.ID.Hex(),
 		Email:     account.Email,
 		IssuedAt:  time.Now(),

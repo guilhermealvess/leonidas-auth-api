@@ -1,14 +1,13 @@
 [
     {
-        "_id": {
-            "$oid": "621fa649aa2a640cfa7c6c7d"
-        },
+        "_id": "621fa649aa2a640cfa7c6c7d",
         "projectId": {
             "$oid": "621fa649aa2a640cfa7c6c7c"
         },
         "name": "Guilherme",
         "lastName": "Alves",
         "email": "guilhermeasilva@gmail.com",
-        "password": "bafae757768683afccbd3c6e1cdda380b4a5e647"
+        "password": "bafae757768683afccbd3c6e1cdda380b4a5e647",
+        "actived": false
     }
 ]

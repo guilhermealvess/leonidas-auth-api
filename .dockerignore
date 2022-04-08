@@ -5,3 +5,4 @@ venv/
 auth
 example.go
 client/
+img/

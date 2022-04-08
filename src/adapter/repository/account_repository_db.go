@@ -4,6 +4,7 @@ import (
 	"api-auth/src/entity"
 	"encoding/json"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -48,6 +49,36 @@ func (repo *AccountRepositoryDB) FindByEmail(email string, projectId primitive.O
 	return account, nil
 }
 
+func (repo *AccountRepositoryDB) FindById(id string) (*entity.Account, error) {
+	account := entity.NewAccount()
+	dataString, err := repo.cache.Get(id)
+	if err != nil || dataString == "" {
+		oid, err := primitive.ObjectIDFromHex(id)
+
+		if err != nil {
+			return account, err
+		}
+
+		data, errorDB := repo.documentDB.FindOne(ACCOUNT, bson.D{{"_id", oid}})
+
+		if errorDB != nil {
+			return account, errorDB
+		}
+
+		dataByte, _ := json.Marshal(data)
+		repo.cache.Set(id, string(dataByte))
+
+		j, _ := json.Marshal(data)
+		json.Unmarshal(j, account)
+
+		return account, nil
+	}
+
+	json.Unmarshal([]byte(dataString), account)
+
+	return account, nil
+}
+
 func (repo *AccountRepositoryDB) Insert(account entity.Account) (primitive.ObjectID, error) {
 	account.ID = primitive.NewObjectID()
 	err := repo.documentDB.InsertOne(ACCOUNT, account)
@@ -57,4 +88,10 @@ func (repo *AccountRepositoryDB) Insert(account entity.Account) (primitive.Objec
 		repo.cache.Set(key, string(data))
 	}
 	return account.ID, err
+}
+
+func (repo *AccountRepositoryDB) UpdateActived(oid primitive.ObjectID) error {
+	return repo.documentDB.UpdateOne(ACCOUNT, oid, bson.D{
+		{"$set", bson.D{{"actived", true}, {"updateAt", time.Now()}, {"updateBy", "SYSTEM"}}},
+	})
 }

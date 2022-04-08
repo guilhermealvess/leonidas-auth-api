@@ -5,8 +5,10 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -17,13 +19,17 @@ import (
 const PASSWORD_LENGTH = 8
 
 type Account struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	ProjectId primitive.ObjectID `bson:"projectId,omitempty"`
-	Name      string             `bson:"name,omitempty"`
-	LastName  string             `bson:"lastName,omitempty"`
-	Email     string             `bson:"email,omitempty"`
-	Password  string             `bson:"password,omitempty"`
-	LastLogin time.Time          `bson:"lastLogin,omitempty"`
+	ID                         primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	ProjectId                  primitive.ObjectID `bson:"projectId,omitempty"`
+	Name                       string             `bson:"name,omitempty"`
+	LastName                   string             `bson:"lastName,omitempty"`
+	Email                      string             `bson:"email,omitempty"`
+	Password                   string             `bson:"password,omitempty"`
+	LastLogin                  time.Time          `bson:"lastLogin,omitempty"`
+	UrlRedirectLaterActivation string             `bson:"url_redirect_later_activation,omitempty"`
+	Activated                  bool               `bson:"activated"`
+	ActivationSecret           string             `bson:"activation_secret,omitempty"`
+	ActivedAt                  time.Time          `bson:"activedAt,omitempty"`
 }
 
 func NewAccount() *Account {
@@ -107,4 +113,21 @@ func (a *Account) VerifyPassword(password string, rounds uint, algorithm string)
 	}
 
 	return password == a.Password
+}
+
+func (a *Account) GenerateActivationLink(tokenJWT string) string {
+	key := base64.StdEncoding.EncodeToString([]byte(tokenJWT))
+
+	baseUrl := os.Getenv("SERVER_BASE_URL")
+	return baseUrl + "account/activation-link?key=" + key
+}
+
+func (a *Account) DecodeActivationKey(key string) (string, error) {
+	tokenJWT, err := base64.StdEncoding.DecodeString(key)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(tokenJWT), err
 }

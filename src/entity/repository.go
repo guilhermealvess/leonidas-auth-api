@@ -15,9 +15,9 @@ type ProjectRepository interface {
 type AccountRepository interface {
 	Insert(account Account) (primitive.ObjectID, error)
 
-	FindByID(id string) error
+	FindByID(id string) (*Account, error)
 
 	FindByEmail(email string, projectId primitive.ObjectID) (*Account, error)
 
-	Update(account Account) error
+	UpdateActived(id primitive.ObjectID) error
 }
