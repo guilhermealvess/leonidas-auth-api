@@ -12,10 +12,9 @@ func TestValidEmail(t *testing.T) {
 		t.Errorf("Want not error")
 	}
 
-	//TODO
-	/*if account.ValidEmail("@gmail.com") == nil || account.ValidEmail("ofadPJASODJ.com") == nil {
+	if account.ValidEmail("@gmail.com") == nil || account.ValidEmail("ofadPJASODJ.com") == nil {
 		t.Errorf("Want error")
-	}*/
+	}
 
 }
 

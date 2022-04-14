@@ -37,10 +37,15 @@ func main() {
 	port := os.Getenv("MONGO_PORT")
 	database := os.Getenv("MONGO_DATABASE")
 	uri := "mongodb://" + host + ":" + port + "/" + database
-	mongoClient, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	mongoClient, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	if err = mongoClient.Ping(context.Background(), nil); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Connected to MongoDB")
 
 	redisCache := db.NewCacheRedisInstance(*rdb)
 	mongoDB := db.NewMongoDBInstance(*mongoClient, database)
@@ -79,6 +84,7 @@ func startHttpServer(db repository.DocumentDB, cache repository.Cache) {
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "OK\n") })
 	router.HandleFunc("/account/activation-link", accountController.ActivationAccount).Methods("GET")
+	router.HandleFunc("/account", accountController.CreateAccount).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }

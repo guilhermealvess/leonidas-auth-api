@@ -9,35 +9,41 @@ import (
 	"encoding/hex"
 	"errors"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 )
 
 const PASSWORD_LENGTH = 8
+const USERNAME_LENGTH = 8
 
 type Account struct {
-	ID                         primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	ProjectId                  primitive.ObjectID `bson:"projectId,omitempty"`
-	Name                       string             `bson:"name,omitempty"`
-	LastName                   string             `bson:"lastName,omitempty"`
-	Email                      string             `bson:"email,omitempty"`
-	Password                   string             `bson:"password,omitempty"`
-	LastLogin                  time.Time          `bson:"lastLogin,omitempty"`
-	UrlRedirectLaterActivation string             `bson:"url_redirect_later_activation,omitempty"`
-	Activated                  bool               `bson:"activated"`
-	ActivationSecret           string             `bson:"activation_secret,omitempty"`
-	ActivedAt                  time.Time          `bson:"activedAt,omitempty"`
+	ID                    string    `json:"id"`
+	ProjectID             string    `json:"projectID"`
+	UID                   uuid.UUID `json:"uid"`
+	FirstName             string    `json:"firtName"`
+	LastName              string    `json:"lastName"`
+	Email                 string    `json:"email"`
+	Username              string    `json:"username"`
+	Password              string    `json:"password"`
+	UrlRedirectActivation string    `json:"urlRedirectActivation"`
+	VerifiedEmail         bool      `json:"verifiedEmail"`
+	IsActive              bool      `json:"isActive"`
+	ActivedAt             time.Time `json:"activedAt"`
+	LastLogin             time.Time `json:"lastLogin"`
 }
 
 func NewAccount() *Account {
-	return &Account{}
+	uid, _ := uuid.NewUUID()
+	return &Account{
+		UID: uid,
+	}
 }
 
 func (a *Account) IsValid() error {
-	if a.Name == "" || a.LastName == "" {
+	if a.FirstName == "" || a.LastName == "" {
 		return errors.New("Name and LastName is required")
 	}
 
@@ -45,7 +51,7 @@ func (a *Account) IsValid() error {
 		return errors.New("Password invalid")
 	}
 
-	if len(a.ProjectId) == 0 {
+	if len(a.ProjectID) == 0 {
 		return errors.New("ProjectId is required")
 	}
 
@@ -54,17 +60,16 @@ func (a *Account) IsValid() error {
 		return err
 	}
 
+	if len(a.Username) < USERNAME_LENGTH {
+		return errors.New("Username invalid")
+	}
+
 	return nil
 }
 
 func (a *Account) ValidEmail(email string) error {
-	valid := regexp.MustCompile(`/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/`)
-
-	if valid.MatchString(email) {
-		return errors.New("Email invalido")
-	}
-
-	return nil
+	validate := validator.New()
+	return validate.Var(email, "email")
 }
 
 func (a *Account) SavePassword(password, algorithm string, rounds uint) error {

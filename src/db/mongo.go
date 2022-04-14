@@ -24,9 +24,11 @@ func NewMongoDBInstance(client mongo.Client, database string) *MongoDB {
 }
 
 func (m *MongoDB) InsertOne(collectionName string, document interface{}) error {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	coll := m.client.Database(m.database).Collection(collectionName)
-	//ctx := getContextWithTimeout(20)
-	_, insertResult := coll.InsertOne(context.Background(), document)
+	_, insertResult := coll.InsertOne(ctx, document)
 
 	return insertResult
 }
@@ -36,9 +38,12 @@ func (m *MongoDB) InsertMany() error {
 }
 
 func (m *MongoDB) FindOne(collectionName string, dataFilter primitive.D) (interface{}, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	var result bson.M
 	coll := m.client.Database(m.database).Collection(collectionName)
-	err := coll.FindOne(context.Background(), dataFilter).Decode(&result)
+	err := coll.FindOne(ctx, dataFilter).Decode(&result)
 
 	return result, err
 }
@@ -48,8 +53,11 @@ func (m *MongoDB) FindByID(id string) error {
 }
 
 func (m *MongoDB) UpdateOne(collectionName string, id primitive.ObjectID, documentFileds primitive.D) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	coll := m.client.Database(m.database).Collection(collectionName)
-	_, err := coll.UpdateOne(context.Background(), bson.M{"_id": id}, documentFileds)
+	_, err := coll.UpdateOne(ctx, bson.M{"_id": id}, documentFileds)
 
 	return err
 }

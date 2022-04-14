@@ -1,11 +1,7 @@
 package entity
 
-import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
-)
-
 type ProjectRepository interface {
-	Insert(project Project) (primitive.ObjectID, error)
+	Insert(project Project) (string, error)
 
 	FindByApiKey(apiKey string) (*Project, error)
 
@@ -13,11 +9,13 @@ type ProjectRepository interface {
 }
 
 type AccountRepository interface {
-	Insert(account Account) (primitive.ObjectID, error)
+	Insert(account Account) (string, error)
 
 	FindByID(id string) (*Account, error)
 
-	FindByEmail(email string, projectId primitive.ObjectID) (*Account, error)
+	FindByUsernameAndProject(username string, projectID string) (*Account, error)
 
-	UpdateActived(id primitive.ObjectID) error
+	UpdateActived(id string) error
+
+	UpdateLastLogin(id string) error
 }

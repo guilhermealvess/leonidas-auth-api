@@ -3,10 +3,8 @@ package entity
 import (
 	"errors"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 const (
@@ -18,21 +16,20 @@ const (
 )
 
 type Project struct {
-	Name         string             `bson:"name,omitempty"`
-	ID           primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	Description  string             `bson:"description,omitempty"`
-	HashAlgoritm string             `bson:"hashAlgoritm,omitempty"`
-	RoundHash    uint               `bson:"roundHash,omitempty"`
-	ApiKey       string             `bson:"apiKey,omitempty"`
-	Secret       string             `bson:"secret,omitempty"`
-	CreatedBy    string             `bson:"createdBy,omitempty"`
-	CreatedAt    time.Time          `bson:"createdAt,omitempty"`
-	UpdatedBy    string             `bson:"updatedBy,omitempty"`
-	UpdatedAt    time.Time          `bson:"updatedAt,omitempty"`
+	Name         string    `json:"name"`
+	UID          uuid.UUID `json:"uid"`
+	ID           string    `json:"_id"`
+	Description  string    `json:"description"`
+	HashAlgoritm string    `json:"hashAlgoritm"`
+	RoundHash    uint      `json:"roundHash"`
+	ApiKey       string    `json:"apiKey"`
+	Secret       string    `json:"secret"`
 }
 
 func NewProject() *Project {
-	return &Project{}
+	return &Project{
+		UID: uuid.New(),
+	}
 }
 
 func (p *Project) GenerateApiKey() string {

@@ -8,10 +8,11 @@ import (
 
 func (s *ApiServerServices) CreateAccount(ctx context.Context, in *pb.CreateAccounttRequest) (*pb.CreateAccountReply, error) {
 	input := usecase.AccountDtoInput{
-		Name:                  in.Account.Name,
+		FirstName:             in.Account.FirstName,
 		LastName:              in.Account.LastName,
 		ApiKey:                in.ApiKey,
 		Email:                 in.Account.Email,
+		Username:              in.Account.Username,
 		Password:              in.Account.Password,
 		UrlRedirectActivation: in.UrlRedirectActivation,
 	}
@@ -19,12 +20,19 @@ func (s *ApiServerServices) CreateAccount(ctx context.Context, in *pb.CreateAcco
 	processAccount := usecase.NewProcessAccount(s.AccountRepository, s.ProjectRepository)
 	output, err := processAccount.ExecuteCreateNewAccount(input)
 
+	if err != nil {
+		return &pb.CreateAccountReply{
+			Success: false,
+			Error:   err.Error(),
+		}, nil
+	}
+
 	return &pb.CreateAccountReply{
-		Error:          output.Error,
-		Success:        output.Success,
+		Success:        true,
+		Error:          "",
 		AccountId:      output.ID,
 		ActivationLink: output.Link,
-	}, err
+	}, nil
 }
 
 func (s *ApiServerServices) RefreshActivationLinkAccount(ctx context.Context, in *pb.RefreshActivationLinkAccountRequest) (*pb.RefreshActivationLinkAccountResponse, error) {

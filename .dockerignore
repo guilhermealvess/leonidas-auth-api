@@ -3,6 +3,7 @@
 venv/
 
 auth
+server
 example.go
 client/
 img/

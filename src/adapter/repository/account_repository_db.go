@@ -6,16 +6,56 @@ import (
 	"log"
 	"time"
 
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-const ACCOUNT = "accounts"
+const (
+	ACCOUNT    = "accounts"
+	ID         = "_id"
+	PROJECT_ID = "projectId"
+	USERNAME   = "username"
+	ACTIVED    = "actived"
+	LAST_LOGIN = "lastLogin"
+	CREATED_AT = "createdAt"
+	CREATED_BY = "createdBy"
+	UPDATED_AT = "updatedAt"
+	UPDATED_BY = "updatedBy"
+	SYSTEM     = "SYSTEM"
+)
 
 type AccountRepositoryDB struct {
 	entity.AccountRepository
+
 	documentDB DocumentDB
 	cache      Cache
+}
+
+type AccountModel struct {
+	ID                         primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	ProjectID                  primitive.ObjectID `bson:"projectId,omitempty"`
+	UID                        string             `bson:"uid,omitempty"`
+	FirstName                  string             `bson:"firstName,omitempty"`
+	LastName                   string             `bson:"lastName,omitempty"`
+	Email                      string             `bson:"email,omitempty"`
+	Username                   string             `bson:"username,omitempty"`
+	Password                   string             `bson:"password,omitempty"`
+	LastLogin                  time.Time          `bson:"lastLogin,omitempty"`
+	UrlRedirectLaterActivation string             `bson:"urlRedirectLaterActivation,omitempty"`
+	IsActive                   bool               `bson:"activated"`
+	VerifiedEmail              bool               `bson:"verifiedEmail,omitempty"`
+	ActivedAt                  time.Time          `bson:"activedAt,omitempty"`
+	createdAt                  time.Time          `bson:"createdAt,omitempty"`
+	createdBy                  string             `bson:"createdBy,omitempty"`
+	updatedAt                  time.Time          `bson:"updatedAt,omitempty"`
+	updatedBy                  string             `bson:"updatedBy,omitempty"`
+}
+
+func NewAccountModel() *AccountModel {
+	return &AccountModel{
+		ID: primitive.NewObjectID(),
+	}
 }
 
 func NewAccountRepositoryDB(documentDB DocumentDB, cache Cache) *AccountRepositoryDB {
@@ -25,73 +65,142 @@ func NewAccountRepositoryDB(documentDB DocumentDB, cache Cache) *AccountReposito
 	}
 }
 
-func (repo *AccountRepositoryDB) FindByEmail(email string, projectId primitive.ObjectID) (*entity.Account, error) {
-	log.Println("FindByEmail, email: %s, projectId: %s", email, projectId)
-	account := entity.NewAccount()
-	key := email + "-" + projectId.String()
+func (repo *AccountRepositoryDB) modelToEntity(model AccountModel) *entity.Account {
+	account := &entity.Account{
+		ID:                    model.ID.Hex(),
+		ProjectID:             model.ProjectID.Hex(),
+		UID:                   uuid.MustParse(model.UID),
+		FirstName:             model.FirstName,
+		LastName:              model.LastName,
+		Email:                 model.Email,
+		Username:              model.Username,
+		Password:              model.Username,
+		UrlRedirectActivation: model.UrlRedirectLaterActivation,
+		VerifiedEmail:         model.VerifiedEmail,
+		IsActive:              model.IsActive,
+		ActivedAt:             model.ActivedAt,
+		LastLogin:             model.LastLogin,
+	}
+
+	return account
+}
+
+func (p *AccountRepositoryDB) entityToModel(account entity.Account) *AccountModel {
+	projectID, _ := primitive.ObjectIDFromHex(account.ProjectID)
+
+	accountID := primitive.NewObjectID()
+	if account.ID != "" {
+		accountID, _ = primitive.ObjectIDFromHex(account.ID)
+	}
+
+	model := &AccountModel{
+		ID:                         accountID,
+		ProjectID:                  projectID,
+		UID:                        account.UID.String(),
+		FirstName:                  account.FirstName,
+		LastName:                   account.LastName,
+		Email:                      account.Email,
+		Username:                   account.Username,
+		Password:                   account.Password,
+		LastLogin:                  account.LastLogin,
+		UrlRedirectLaterActivation: account.UrlRedirectActivation,
+		IsActive:                   account.IsActive,
+		VerifiedEmail:              account.VerifiedEmail,
+		ActivedAt:                  account.ActivedAt,
+	}
+
+	return model
+}
+
+func (repo *AccountRepositoryDB) FindByUsernameAndProject(username string, projectID string) (*entity.Account, error) {
+	log.Println("FindByUsernameAndProject, username: %s, projectID: %s", username, projectID)
+	var account entity.Account
+	var model AccountModel
+
+	key := projectID + ":" + username
 	dataString, err := repo.cache.Get(key)
+
 	if err != nil || dataString == "" {
-		data, errorDB := repo.documentDB.FindOne(ACCOUNT, bson.D{{"projectId", projectId}, {"email", email}})
+		oid, _ := primitive.ObjectIDFromHex(projectID)
+		data, errorDB := repo.documentDB.FindOne(ACCOUNT, bson.D{{PROJECT_ID, oid}, {USERNAME, username}})
 
 		if errorDB != nil {
-			return account, errorDB
+			return &account, errorDB
 		}
+
 		dataByte, _ := json.Marshal(data)
 		repo.cache.Set(key, string(dataByte))
 
 		j, _ := json.Marshal(data)
-		json.Unmarshal(j, account)
+		json.Unmarshal(j, &model)
 
-		return account, nil
+		account = *repo.modelToEntity(model)
+		return &account, nil
 	}
-	json.Unmarshal([]byte(dataString), account)
+	json.Unmarshal([]byte(dataString), &model)
 
-	return account, nil
+	return repo.modelToEntity(model), nil
 }
 
-func (repo *AccountRepositoryDB) FindById(id string) (*entity.Account, error) {
-	account := entity.NewAccount()
+func (repo *AccountRepositoryDB) FindByID(id string) (*entity.Account, error) {
+	var account entity.Account
+	var model AccountModel
+
 	dataString, err := repo.cache.Get(id)
+
 	if err != nil || dataString == "" {
 		oid, err := primitive.ObjectIDFromHex(id)
 
 		if err != nil {
-			return account, err
+			return &account, err
 		}
 
-		data, errorDB := repo.documentDB.FindOne(ACCOUNT, bson.D{{"_id", oid}})
+		data, errorDB := repo.documentDB.FindOne(ACCOUNT, bson.D{{ID, oid}})
 
 		if errorDB != nil {
-			return account, errorDB
+			return &account, errorDB
 		}
 
 		dataByte, _ := json.Marshal(data)
 		repo.cache.Set(id, string(dataByte))
 
 		j, _ := json.Marshal(data)
-		json.Unmarshal(j, account)
+		json.Unmarshal(j, &model)
 
-		return account, nil
+		return repo.modelToEntity(model), nil
 	}
 
-	json.Unmarshal([]byte(dataString), account)
+	json.Unmarshal([]byte(dataString), &model)
 
-	return account, nil
+	return repo.modelToEntity(model), nil
 }
 
-func (repo *AccountRepositoryDB) Insert(account entity.Account) (primitive.ObjectID, error) {
-	account.ID = primitive.NewObjectID()
-	err := repo.documentDB.InsertOne(ACCOUNT, account)
+func (repo *AccountRepositoryDB) Insert(account entity.Account) (string, error) {
+	acc := repo.entityToModel(account)
+	acc.createdAt = time.Now()
+	acc.createdBy = SYSTEM
+
+	err := repo.documentDB.InsertOne(ACCOUNT, acc)
+
 	if err == nil {
 		data, _ := json.Marshal(account)
-		key := account.Email + "-" + account.ProjectId.String()
+		key := account.UID.String()
 		repo.cache.Set(key, string(data))
 	}
-	return account.ID, err
+	return acc.ID.Hex(), err
 }
 
-func (repo *AccountRepositoryDB) UpdateActived(oid primitive.ObjectID) error {
+func (repo *AccountRepositoryDB) UpdateActived(id string) error {
+	oid, _ := primitive.ObjectIDFromHex(id)
 	return repo.documentDB.UpdateOne(ACCOUNT, oid, bson.D{
-		{"$set", bson.D{{"actived", true}, {"updateAt", time.Now()}, {"updateBy", "SYSTEM"}}},
+		{"$set", bson.D{{ACTIVED, true}, {UPDATED_AT, time.Now()}, {UPDATED_BY, SYSTEM}}},
+	})
+}
+
+func (repo *AccountRepositoryDB) UpdateLastLogin(id string) error {
+	oid, _ := primitive.ObjectIDFromHex(id)
+	now := time.Now()
+	return repo.documentDB.UpdateOne(ACCOUNT, oid, bson.D{
+		{"$set", bson.D{{LAST_LOGIN, now}, {UPDATED_AT, now}, {UPDATED_BY, SYSTEM}}},
 	})
 }

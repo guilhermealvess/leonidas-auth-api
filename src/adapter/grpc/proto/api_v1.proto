@@ -19,10 +19,11 @@ service ApiV1Services {
 }
 
 message Account {
-    string name = 1;
+    string firstName = 1;
     string lastName = 2;
     string email = 3;
-    string password = 4;
+    string username = 4;
+    string password = 5;
 }
 
 message CreateAccounttRequest {
@@ -100,7 +101,7 @@ message Project {
     string name = 1;
     string description = 2;
     string hashAlgorithm = 3;
-    int32 roundHash = 4;
+    uint32 roundHash = 4;
 }
 
 message CreateProjectRequest {

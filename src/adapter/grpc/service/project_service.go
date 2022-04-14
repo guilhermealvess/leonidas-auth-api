@@ -15,12 +15,17 @@ func (s *ApiServerServices) CreateProject(ctx context.Context, in *pb.CreateProj
 	}
 
 	processProject := usecase.NewProcessProject(s.ProjectRepository)
-
 	output, err := processProject.ExecuteCreateNewProject(input)
 
+	if err != nil {
+		return &pb.CreateProjectReply{
+			Success: false,
+			Error:   err.Error(),
+		}, nil
+	}
+
 	return &pb.CreateProjectReply{
-		Error:   output.Error,
-		Success: output.Success,
+		Success: true,
 		ApiKey:  output.ApiKey,
-	}, err
+	}, nil
 }

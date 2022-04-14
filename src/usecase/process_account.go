@@ -4,30 +4,26 @@ import (
 	"api-auth/src/adapter/jwt"
 	"api-auth/src/entity"
 	"errors"
-
-	"github.com/google/uuid"
+	"fmt"
 )
 
 type AccountDtoInput struct {
-	ApiKey                string
-	Name                  string
-	LastName              string
-	Email                 string
-	Password              string
-	UrlRedirectActivation string
+	ApiKey                string `json:"apiKey"`
+	FirstName             string `json:"firstName"`
+	LastName              string `json:"lastName"`
+	Email                 string `json:"email"`
+	Username              string `json:"username"`
+	Password              string `json:"password"`
+	UrlRedirectActivation string `json:"urlRedirectActivation"`
 }
 
 type AccountDtoOutput struct {
-	Success bool
-	Error   string
-	ID      string
-	Link    string
+	ID   string `json:"id"`
+	Link string `json:"link"`
 }
 
 type ActivationAccountDtoOutput struct {
-	Success bool
-	Error   string
-	Url     string
+	Url string `json:"url"`
 }
 
 type ProcessAccount struct {
@@ -45,129 +41,94 @@ func NewProcessAccount(repository entity.AccountRepository, projectRepository en
 }
 
 func (p *ProcessAccount) ExecuteCreateNewAccount(input AccountDtoInput) (*AccountDtoOutput, error) {
-	account := entity.NewAccount()
-
 	project, err := p.projectRepository.FindByApiKey(input.ApiKey)
-	
+
 	if err != nil {
 		return &AccountDtoOutput{}, errors.New("Credential invalid")
 	}
 
-	account.Name = input.Name
+	account := entity.NewAccount()
+	account.FirstName = input.FirstName
 	account.LastName = input.LastName
 	account.Email = input.Email
+	account.Username = input.Username
 	account.Password = input.Password
-	account.ProjectId = project.ID
-	account.UrlRedirectLaterActivation = input.UrlRedirectActivation
-	account.Activated = false
+	account.ProjectID = project.ID
+	account.UrlRedirectActivation = input.UrlRedirectActivation
+	account.IsActive = false
 
 	err = account.IsValid()
 	if err != nil {
-		return &AccountDtoOutput{
-			Success: false,
-			Error:   err.Error(),
-			ID:      "",
-			Link:    "",
-		}, err
+		return &AccountDtoOutput{}, err
+	}
+
+	a, err := p.Repository.FindByUsernameAndProject(account.Username, account.ProjectID)
+	if err == nil {
+		fmt.Print(a)
+		return &AccountDtoOutput{}, errors.New("Username not available")
 	}
 
 	err = account.SavePassword(input.Password, project.HashAlgoritm, project.RoundHash)
 	if err != nil {
-		return &AccountDtoOutput{
-			Success: false,
-			Error:   err.Error(),
-			ID:      "",
-			Link:    "",
-		}, err
+		return &AccountDtoOutput{}, err
 	}
 
-	return p.createAccount(*account)
-}
-
-func (p *ProcessAccount) createAccount(account entity.Account) (*AccountDtoOutput, error) {
-	_, err := p.Repository.FindByEmail(account.Email, account.ProjectId)
-	if err == nil {
-		return &AccountDtoOutput{}, errors.New("Account not enable")
-	}
-
-	activationSecret := uuid.NewString()
-	account.ActivationSecret = activationSecret
-	oid, err := p.Repository.Insert(account)
+	id, err := p.Repository.Insert(*account)
 
 	if err == nil {
 		payload := jwt.Payload{
-			ID: oid.Hex(),
+			ID: id,
 		}
 
-		tokenJWT, err := p.jwtMaker.CreateToken(payload, activationSecret)
+		tokenJWT, err := p.jwtMaker.CreateToken(payload, account.UID.String())
 
 		if err != nil {
-			return &AccountDtoOutput{
-				Error:   "Não foi possivel criar uma conta",
-				Success: false,
-				ID:      "",
-				Link:    "",
-			}, err
+			return &AccountDtoOutput{}, errors.New("Não foi possivel criar uma conta")
 
 		}
 
-		output := &AccountDtoOutput{
-			Error:   "",
-			Success: true,
-			ID:      oid.Hex(),
-			Link:    account.GenerateActivationLink(tokenJWT),
-		}
-
-		return output, nil
+		return &AccountDtoOutput{
+			ID:   id,
+			Link: account.GenerateActivationLink(tokenJWT),
+		}, nil
 	}
 
-	return &AccountDtoOutput{
-		Error:   "Não foi possivel criar uma conta",
-		Success: false,
-		ID:      "",
-		Link:    "",
-	}, err
+	return &AccountDtoOutput{}, errors.New("Não foi possivel criar uma conta")
 }
 
-func (p *ProcessAccount) ActivateAccount(key string) *ActivationAccountDtoOutput {
+func (p *ProcessAccount) ActivateAccount(key string) (*ActivationAccountDtoOutput, error) {
 	account := entity.NewAccount()
 
 	token, err := account.DecodeActivationKey(key)
 
 	if err != nil {
-		return activateAccountFail(err)
+		return &ActivationAccountDtoOutput{}, err
 	}
 
 	payload, err := p.jwtMaker.ParserToken(token)
 
 	if err != nil {
-		return activateAccountFail(err)
+		return &ActivationAccountDtoOutput{}, err
 	}
 
 	acc, err := p.Repository.FindByID(payload.ID)
 
 	if err != nil {
-		return activateAccountFail(err)
+		return &ActivationAccountDtoOutput{}, err
 	}
 
-	if _, err = p.jwtMaker.Verify(token, acc.ActivationSecret); err != nil {
-		return activateAccountFail(err)
+	if _, err = p.jwtMaker.Verify(token, acc.UID.String()); err != nil {
+		return &ActivationAccountDtoOutput{}, err
 	}
 
 	if err = p.Repository.UpdateActived(acc.ID); err != nil {
-		return activateAccountFail(err)
+		return &ActivationAccountDtoOutput{}, err
 	}
 
-	return activateAccountFail(err)
-
-}
-
-func activateAccountFail(err error) *ActivationAccountDtoOutput {
 	return &ActivationAccountDtoOutput{
-		Success: false,
-		Error:   err.Error(),
-		Url:     "",
-	}
+		Url: acc.UrlRedirectActivation,
+	}, nil
+
 }
 
 func (p *ProcessAccount) RefreshActivationLinkAccount(id string) (string, error) {
@@ -178,7 +139,7 @@ func (p *ProcessAccount) RefreshActivationLinkAccount(id string) (string, error)
 	}
 
 	payload := jwt.Payload{ID: id}
-	token, err := p.jwtMaker.CreateToken(payload, account.ActivationSecret)
+	token, err := p.jwtMaker.CreateToken(payload, account.UID.String())
 
 	if err != nil {
 		return "", err

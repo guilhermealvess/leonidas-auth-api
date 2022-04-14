@@ -4,6 +4,7 @@ import (
 	"api-auth/src/adapter/repository"
 	"api-auth/src/entity"
 	"api-auth/src/usecase"
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -27,14 +28,32 @@ func (a *AccountController) ActivationAccount(w http.ResponseWriter, r *http.Req
 	activationKey := r.URL.Query().Get("key")
 
 	processAccount := usecase.NewProcessAccount(a.AccountRepository, a.ProjectRepository)
-	output := processAccount.ActivateAccount(activationKey)
+	output, err := processAccount.ActivateAccount(activationKey)
 
-	if output.Success {
+	if err == nil {
 		http.Redirect(w, r, output.Url, http.StatusPermanentRedirect)
 		return
 	}
 
 	w.WriteHeader(http.StatusBadRequest)
-	fmt.Fprint(w, output.Error)
+	fmt.Fprint(w, err.Error())
 	return
+}
+
+func (a *AccountController) CreateAccount(w http.ResponseWriter, r *http.Request) {
+	var payload usecase.AccountDtoInput
+	decoder := json.NewDecoder(r.Body)
+
+	if err := decoder.Decode(&payload); err != nil {
+		respondWithError(w, http.StatusBadRequest, msgErrorPayload)
+	}
+
+	processAccount := usecase.NewProcessAccount(a.AccountRepository, a.ProjectRepository)
+	output, err := processAccount.ExecuteCreateNewAccount(payload)
+
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+	}
+
+	respondWithJSON(w, http.StatusCreated, output)
 }

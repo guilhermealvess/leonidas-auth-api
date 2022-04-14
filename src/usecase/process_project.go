@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"api-auth/src/entity"
-	"time"
 )
 
 type ProjectDtoInput struct {
@@ -13,9 +12,7 @@ type ProjectDtoInput struct {
 }
 
 type ProjectDtoOutput struct {
-	Success bool
-	Error   string
-	ApiKey  string
+	ApiKey string
 }
 
 type ProcessProject struct {
@@ -43,25 +40,17 @@ func (p *ProcessProject) ExecuteCreateNewProject(projectInput ProjectDtoInput) (
 
 func (p *ProcessProject) createNewProject(project *entity.Project) (ProjectDtoOutput, error) {
 
-	apiKey := project.GenerateApiKey()
+	project.ApiKey = project.GenerateApiKey()
 	project.Secret = project.GenerateSecret()
-	project.CreatedAt = time.Now()
-	project.CreatedBy = "SYSTEM"
 
 	_, err := p.Repository.Insert(*project)
 	if err == nil {
 		output := ProjectDtoOutput{
-			Success: true,
-			Error:   "",
-			ApiKey:  apiKey,
+			ApiKey: project.ApiKey,
 		}
 
 		return output, nil
 	}
 
-	return ProjectDtoOutput{
-		Success: false,
-		Error:   "Não foi possivel criar um projeto",
-		ApiKey:  "",
-	}, err
+	return ProjectDtoOutput{}, err
 }
