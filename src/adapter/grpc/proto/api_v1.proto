@@ -5,16 +5,18 @@ option go_package = "./;pb";
 service ApiV1Services {
     rpc SayHello (HelloRequest) returns (HelloReply) {};
 
+    //ACCOUNTS
     rpc CreateAccount (CreateAccounttRequest) returns (CreateAccountReply) {};
 
-    rpc RefreshActivationLinkAccount (RefreshActivationLinkAccountRequest) returns (RefreshActivationLinkAccountResponse);
+    rpc ActivateAccount (ActivateAccountRequest) returns (ActivateAccountResponse);
+
+    rpc SetNewPassowrd (NewPassowrdRequest) returns (NewPassowrdResponse);
 
     rpc SignIn (SigninRequest) returns (SigninReply) {};
 
     rpc VerifyToken (VerifyTokenRequest) returns (VerifyTokenReply) {};
 
-    rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenReply) {};
-
+    //PROJECTS
     rpc CreateProject (CreateProjectRequest) returns (CreateProjectReply) {};
 }
 
@@ -28,26 +30,34 @@ message Account {
 
 message CreateAccounttRequest {
     Account account = 1;
-    string urlRedirectActivation = 2;
-    string apiKey = 3;
+    string apiKey = 2;
 }
 
 message CreateAccountReply {
     bool success = 1;
     string error = 2;
     string accountId = 3;
-    string activationLink = 4;
 }
 
-message RefreshActivationLinkAccountRequest {
-    string id = 1;
+message ActivateAccountRequest {
+    string apiKey = 1;
+    string username = 2;
 }
 
-message RefreshActivationLinkAccountResponse {
+message ActivateAccountResponse {
     bool success = 1;
     string error = 2;
-    string link  = 3;
 }
+
+message NewPassowrdRequest {
+    string apiKey = 1;
+    string username = 2;
+    string newPassword = 3;
+}
+
+message NewPassowrdResponse {
+    bool success = 1;
+    string error = 2;}
 
 message SigninRequest {
     string email = 1;
@@ -77,16 +87,6 @@ message VerifyTokenReply {
     bool success = 1;
     string error = 2;
     Payload Payload = 3;
-}
-
-message RefreshTokenRequest {
-    string token = 1;
-}
-
-message RefreshTokenReply {
-    bool success = 1;
-    string error = 2;
-    string token = 3;
 }
 
 message HelloRequest {

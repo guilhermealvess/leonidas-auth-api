@@ -19,11 +19,13 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ApiV1ServicesClient interface {
 	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
+	//ACCOUNTS
 	CreateAccount(ctx context.Context, in *CreateAccounttRequest, opts ...grpc.CallOption) (*CreateAccountReply, error)
-	RefreshActivationLinkAccount(ctx context.Context, in *RefreshActivationLinkAccountRequest, opts ...grpc.CallOption) (*RefreshActivationLinkAccountResponse, error)
+	ActivateAccount(ctx context.Context, in *ActivateAccountRequest, opts ...grpc.CallOption) (*ActivateAccountResponse, error)
+	SetNewPassowrd(ctx context.Context, in *NewPassowrdRequest, opts ...grpc.CallOption) (*NewPassowrdResponse, error)
 	SignIn(ctx context.Context, in *SigninRequest, opts ...grpc.CallOption) (*SigninReply, error)
 	VerifyToken(ctx context.Context, in *VerifyTokenRequest, opts ...grpc.CallOption) (*VerifyTokenReply, error)
-	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenReply, error)
+	//PROJECTS
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectReply, error)
 }
 
@@ -53,9 +55,18 @@ func (c *apiV1ServicesClient) CreateAccount(ctx context.Context, in *CreateAccou
 	return out, nil
 }
 
-func (c *apiV1ServicesClient) RefreshActivationLinkAccount(ctx context.Context, in *RefreshActivationLinkAccountRequest, opts ...grpc.CallOption) (*RefreshActivationLinkAccountResponse, error) {
-	out := new(RefreshActivationLinkAccountResponse)
-	err := c.cc.Invoke(ctx, "/ApiV1Services/RefreshActivationLinkAccount", in, out, opts...)
+func (c *apiV1ServicesClient) ActivateAccount(ctx context.Context, in *ActivateAccountRequest, opts ...grpc.CallOption) (*ActivateAccountResponse, error) {
+	out := new(ActivateAccountResponse)
+	err := c.cc.Invoke(ctx, "/ApiV1Services/ActivateAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *apiV1ServicesClient) SetNewPassowrd(ctx context.Context, in *NewPassowrdRequest, opts ...grpc.CallOption) (*NewPassowrdResponse, error) {
+	out := new(NewPassowrdResponse)
+	err := c.cc.Invoke(ctx, "/ApiV1Services/SetNewPassowrd", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,15 +91,6 @@ func (c *apiV1ServicesClient) VerifyToken(ctx context.Context, in *VerifyTokenRe
 	return out, nil
 }
 
-func (c *apiV1ServicesClient) RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenReply, error) {
-	out := new(RefreshTokenReply)
-	err := c.cc.Invoke(ctx, "/ApiV1Services/RefreshToken", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *apiV1ServicesClient) CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectReply, error) {
 	out := new(CreateProjectReply)
 	err := c.cc.Invoke(ctx, "/ApiV1Services/CreateProject", in, out, opts...)
@@ -103,11 +105,13 @@ func (c *apiV1ServicesClient) CreateProject(ctx context.Context, in *CreateProje
 // for forward compatibility
 type ApiV1ServicesServer interface {
 	SayHello(context.Context, *HelloRequest) (*HelloReply, error)
+	//ACCOUNTS
 	CreateAccount(context.Context, *CreateAccounttRequest) (*CreateAccountReply, error)
-	RefreshActivationLinkAccount(context.Context, *RefreshActivationLinkAccountRequest) (*RefreshActivationLinkAccountResponse, error)
+	ActivateAccount(context.Context, *ActivateAccountRequest) (*ActivateAccountResponse, error)
+	SetNewPassowrd(context.Context, *NewPassowrdRequest) (*NewPassowrdResponse, error)
 	SignIn(context.Context, *SigninRequest) (*SigninReply, error)
 	VerifyToken(context.Context, *VerifyTokenRequest) (*VerifyTokenReply, error)
-	RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenReply, error)
+	//PROJECTS
 	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectReply, error)
 	mustEmbedUnimplementedApiV1ServicesServer()
 }
@@ -122,17 +126,17 @@ func (UnimplementedApiV1ServicesServer) SayHello(context.Context, *HelloRequest)
 func (UnimplementedApiV1ServicesServer) CreateAccount(context.Context, *CreateAccounttRequest) (*CreateAccountReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
 }
-func (UnimplementedApiV1ServicesServer) RefreshActivationLinkAccount(context.Context, *RefreshActivationLinkAccountRequest) (*RefreshActivationLinkAccountResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RefreshActivationLinkAccount not implemented")
+func (UnimplementedApiV1ServicesServer) ActivateAccount(context.Context, *ActivateAccountRequest) (*ActivateAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ActivateAccount not implemented")
+}
+func (UnimplementedApiV1ServicesServer) SetNewPassowrd(context.Context, *NewPassowrdRequest) (*NewPassowrdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetNewPassowrd not implemented")
 }
 func (UnimplementedApiV1ServicesServer) SignIn(context.Context, *SigninRequest) (*SigninReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
 }
 func (UnimplementedApiV1ServicesServer) VerifyToken(context.Context, *VerifyTokenRequest) (*VerifyTokenReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyToken not implemented")
-}
-func (UnimplementedApiV1ServicesServer) RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
 }
 func (UnimplementedApiV1ServicesServer) CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
@@ -186,20 +190,38 @@ func _ApiV1Services_CreateAccount_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ApiV1Services_RefreshActivationLinkAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RefreshActivationLinkAccountRequest)
+func _ApiV1Services_ActivateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ActivateAccountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ApiV1ServicesServer).RefreshActivationLinkAccount(ctx, in)
+		return srv.(ApiV1ServicesServer).ActivateAccount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ApiV1Services/RefreshActivationLinkAccount",
+		FullMethod: "/ApiV1Services/ActivateAccount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApiV1ServicesServer).RefreshActivationLinkAccount(ctx, req.(*RefreshActivationLinkAccountRequest))
+		return srv.(ApiV1ServicesServer).ActivateAccount(ctx, req.(*ActivateAccountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ApiV1Services_SetNewPassowrd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewPassowrdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApiV1ServicesServer).SetNewPassowrd(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ApiV1Services/SetNewPassowrd",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApiV1ServicesServer).SetNewPassowrd(ctx, req.(*NewPassowrdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -240,24 +262,6 @@ func _ApiV1Services_VerifyToken_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ApiV1Services_RefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RefreshTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ApiV1ServicesServer).RefreshToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ApiV1Services/RefreshToken",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ApiV1ServicesServer).RefreshToken(ctx, req.(*RefreshTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _ApiV1Services_CreateProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateProjectRequest)
 	if err := dec(in); err != nil {
@@ -292,8 +296,12 @@ var ApiV1Services_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ApiV1Services_CreateAccount_Handler,
 		},
 		{
-			MethodName: "RefreshActivationLinkAccount",
-			Handler:    _ApiV1Services_RefreshActivationLinkAccount_Handler,
+			MethodName: "ActivateAccount",
+			Handler:    _ApiV1Services_ActivateAccount_Handler,
+		},
+		{
+			MethodName: "SetNewPassowrd",
+			Handler:    _ApiV1Services_SetNewPassowrd_Handler,
 		},
 		{
 			MethodName: "SignIn",
@@ -302,10 +310,6 @@ var ApiV1Services_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VerifyToken",
 			Handler:    _ApiV1Services_VerifyToken_Handler,
-		},
-		{
-			MethodName: "RefreshToken",
-			Handler:    _ApiV1Services_RefreshToken_Handler,
 		},
 		{
 			MethodName: "CreateProject",

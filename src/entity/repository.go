@@ -18,4 +18,7 @@ type AccountRepository interface {
 	UpdateActived(id string) error
 
 	UpdateLastLogin(id string) error
+
+	UpdatePassword(id string, password string) error
 }
+	

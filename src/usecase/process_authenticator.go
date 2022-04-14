@@ -3,7 +3,7 @@ package usecase
 import (
 	"api-auth/src/adapter/jwt"
 	"api-auth/src/entity"
-	"math"
+	"errors"
 	"time"
 )
 
@@ -53,15 +53,19 @@ func (p *ProcessAuthenticator) Sign(input ProcessSignInput) (*ProcessSignOutput,
 		return &ProcessSignOutput{}, err
 	}
 
+	if !account.IsActive {
+		return &ProcessSignOutput{}, errors.New("Account not active")
+	}
+
 	if !account.VerifyPassword(input.Password, project.RoundHash, project.HashAlgoritm) {
-		return &ProcessSignOutput{}, err
+		return &ProcessSignOutput{}, errors.New("Password invalid")
 	}
 
 	tokenJWT, err := p.jwtMaker.CreateToken(jwt.Payload{
 		ID:        account.ID,
 		Email:     account.Email,
 		IssuedAt:  time.Now(),
-		ExpiredAt: time.Now().Add(time.Duration(60 * 60 * math.Pow(10, 9))),
+		ExpiredAt: time.Now().Add(60 * time.Minute),
 	}, project.Secret)
 
 	if err != nil {

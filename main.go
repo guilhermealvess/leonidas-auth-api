@@ -50,7 +50,7 @@ func main() {
 	redisCache := db.NewCacheRedisInstance(*rdb)
 	mongoDB := db.NewMongoDBInstance(*mongoClient, database)
 
-	go startHttpServer(mongoDB, redisCache)
+	//go startHttpServer(mongoDB, redisCache)
 
 	startGRPCServer(mongoDB, redisCache)
 }
@@ -83,7 +83,6 @@ func startHttpServer(db repository.DocumentDB, cache repository.Cache) {
 	accountController := rest.NewAccountController(db, cache)
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "OK\n") })
-	router.HandleFunc("/account/activation-link", accountController.ActivationAccount).Methods("GET")
 	router.HandleFunc("/account", accountController.CreateAccount).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":"+port, router))

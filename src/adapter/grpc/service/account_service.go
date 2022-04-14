@@ -8,13 +8,12 @@ import (
 
 func (s *ApiServerServices) CreateAccount(ctx context.Context, in *pb.CreateAccounttRequest) (*pb.CreateAccountReply, error) {
 	input := usecase.AccountDtoInput{
-		FirstName:             in.Account.FirstName,
-		LastName:              in.Account.LastName,
-		ApiKey:                in.ApiKey,
-		Email:                 in.Account.Email,
-		Username:              in.Account.Username,
-		Password:              in.Account.Password,
-		UrlRedirectActivation: in.UrlRedirectActivation,
+		FirstName: in.Account.FirstName,
+		LastName:  in.Account.LastName,
+		ApiKey:    in.ApiKey,
+		Email:     in.Account.Email,
+		Username:  in.Account.Username,
+		Password:  in.Account.Password,
 	}
 
 	processAccount := usecase.NewProcessAccount(s.AccountRepository, s.ProjectRepository)
@@ -28,30 +27,45 @@ func (s *ApiServerServices) CreateAccount(ctx context.Context, in *pb.CreateAcco
 	}
 
 	return &pb.CreateAccountReply{
-		Success:        true,
-		Error:          "",
-		AccountId:      output.ID,
-		ActivationLink: output.Link,
+		Success:   true,
+		AccountId: output.ID,
 	}, nil
 }
 
-func (s *ApiServerServices) RefreshActivationLinkAccount(ctx context.Context, in *pb.RefreshActivationLinkAccountRequest) (*pb.RefreshActivationLinkAccountResponse, error) {
-	input := in.Id
-
-	processAccount := usecase.NewProcessAccount(s.AccountRepository, s.ProjectRepository)
-
-	link, err := processAccount.RefreshActivationLinkAccount(input)
-	sucess := true
-	e := ""
-
-	if err != nil {
-		sucess = false
-		e = err.Error()
+func (s *ApiServerServices) ActivateAccount(ctx context.Context, in *pb.ActivateAccountRequest) (*pb.ActivateAccountResponse, error) {
+	input := usecase.ActivationAccountDtoInput{
+		ApiKey:   in.ApiKey,
+		Username: in.Username,
 	}
 
-	return &pb.RefreshActivationLinkAccountResponse{
-		Success: sucess,
-		Error:   e,
-		Link:    link,
-	}, err
+	processAccount := usecase.NewProcessAccount(s.AccountRepository, s.ProjectRepository)
+	if err := processAccount.ActivateAccount(input); err != nil {
+		return &pb.ActivateAccountResponse{
+			Success: false,
+			Error:   err.Error(),
+		}, nil
+	}
+
+	return &pb.ActivateAccountResponse{
+		Success: true,
+	}, nil
+}
+
+func (s *ApiServerServices) SetNewPassowrd(ctx context.Context, in *pb.NewPassowrdRequest) (*pb.NewPassowrdResponse, error) {
+	input := usecase.SetNewPassowrdDtoInput{
+		ApiKey:   in.ApiKey,
+		Username: in.Username,
+	}
+	processAccount := usecase.NewProcessAccount(s.AccountRepository, s.ProjectRepository)
+
+	if err := processAccount.SetNewPassword(input); err != nil {
+		return &pb.NewPassowrdResponse{
+			Success: false,
+			Error:   err.Error(),
+		}, nil
+	}
+
+	return &pb.NewPassowrdResponse{
+		Success: true,
+	}, nil
 }

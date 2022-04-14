@@ -5,10 +5,8 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
-	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"os"
 	"strings"
 	"time"
 
@@ -20,19 +18,18 @@ const PASSWORD_LENGTH = 8
 const USERNAME_LENGTH = 8
 
 type Account struct {
-	ID                    string    `json:"id"`
-	ProjectID             string    `json:"projectID"`
-	UID                   uuid.UUID `json:"uid"`
-	FirstName             string    `json:"firtName"`
-	LastName              string    `json:"lastName"`
-	Email                 string    `json:"email"`
-	Username              string    `json:"username"`
-	Password              string    `json:"password"`
-	UrlRedirectActivation string    `json:"urlRedirectActivation"`
-	VerifiedEmail         bool      `json:"verifiedEmail"`
-	IsActive              bool      `json:"isActive"`
-	ActivedAt             time.Time `json:"activedAt"`
-	LastLogin             time.Time `json:"lastLogin"`
+	ID            string    `json:"id"`
+	ProjectID     string    `json:"projectID"`
+	UID           uuid.UUID `json:"uid"`
+	FirstName     string    `json:"firtName"`
+	LastName      string    `json:"lastName"`
+	Email         string    `json:"email"`
+	Username      string    `json:"username"`
+	Password      string    `json:"password"`
+	VerifiedEmail bool      `json:"verifiedEmail"`
+	IsActive      bool      `json:"isActive"`
+	ActivedAt     time.Time `json:"activedAt"`
+	LastLogin     time.Time `json:"lastLogin"`
 }
 
 func NewAccount() *Account {
@@ -120,19 +117,7 @@ func (a *Account) VerifyPassword(password string, rounds uint, algorithm string)
 	return password == a.Password
 }
 
-func (a *Account) GenerateActivationLink(tokenJWT string) string {
-	key := base64.StdEncoding.EncodeToString([]byte(tokenJWT))
-
-	baseUrl := os.Getenv("SERVER_BASE_URL")
-	return baseUrl + "account/activation-link?key=" + key
-}
-
-func (a *Account) DecodeActivationKey(key string) (string, error) {
-	tokenJWT, err := base64.StdEncoding.DecodeString(key)
-
-	if err != nil {
-		return "", err
-	}
-
-	return string(tokenJWT), err
+func (a *Account) ActivedAccount() {
+	a.ActivedAt = time.Now()
+	a.IsActive = true
 }

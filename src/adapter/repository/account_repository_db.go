@@ -16,8 +16,9 @@ const (
 	ID         = "_id"
 	PROJECT_ID = "projectId"
 	USERNAME   = "username"
-	ACTIVED    = "actived"
+	ACTIVED    = "activated"
 	LAST_LOGIN = "lastLogin"
+	PASSWORD   = "password"
 	CREATED_AT = "createdAt"
 	CREATED_BY = "createdBy"
 	UPDATED_AT = "updatedAt"
@@ -33,23 +34,22 @@ type AccountRepositoryDB struct {
 }
 
 type AccountModel struct {
-	ID                         primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	ProjectID                  primitive.ObjectID `bson:"projectId,omitempty"`
-	UID                        string             `bson:"uid,omitempty"`
-	FirstName                  string             `bson:"firstName,omitempty"`
-	LastName                   string             `bson:"lastName,omitempty"`
-	Email                      string             `bson:"email,omitempty"`
-	Username                   string             `bson:"username,omitempty"`
-	Password                   string             `bson:"password,omitempty"`
-	LastLogin                  time.Time          `bson:"lastLogin,omitempty"`
-	UrlRedirectLaterActivation string             `bson:"urlRedirectLaterActivation,omitempty"`
-	IsActive                   bool               `bson:"activated"`
-	VerifiedEmail              bool               `bson:"verifiedEmail,omitempty"`
-	ActivedAt                  time.Time          `bson:"activedAt,omitempty"`
-	createdAt                  time.Time          `bson:"createdAt,omitempty"`
-	createdBy                  string             `bson:"createdBy,omitempty"`
-	updatedAt                  time.Time          `bson:"updatedAt,omitempty"`
-	updatedBy                  string             `bson:"updatedBy,omitempty"`
+	ID            primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+	ProjectID     primitive.ObjectID `bson:"projectId,omitempty"`
+	UID           string             `bson:"uid,omitempty"`
+	FirstName     string             `bson:"firstName,omitempty"`
+	LastName      string             `bson:"lastName,omitempty"`
+	Email         string             `bson:"email,omitempty"`
+	Username      string             `bson:"username,omitempty"`
+	Password      string             `bson:"password,omitempty"`
+	LastLogin     time.Time          `bson:"lastLogin,omitempty"`
+	IsActive      bool               `bson:"activated"`
+	VerifiedEmail bool               `bson:"verifiedEmail,omitempty"`
+	ActivedAt     time.Time          `bson:"activedAt,omitempty"`
+	createdAt     time.Time          `bson:"createdAt,omitempty"`
+	createdBy     string             `bson:"createdBy,omitempty"`
+	updatedAt     time.Time          `bson:"updatedAt,omitempty"`
+	updatedBy     string             `bson:"updatedBy,omitempty"`
 }
 
 func NewAccountModel() *AccountModel {
@@ -67,19 +67,18 @@ func NewAccountRepositoryDB(documentDB DocumentDB, cache Cache) *AccountReposito
 
 func (repo *AccountRepositoryDB) modelToEntity(model AccountModel) *entity.Account {
 	account := &entity.Account{
-		ID:                    model.ID.Hex(),
-		ProjectID:             model.ProjectID.Hex(),
-		UID:                   uuid.MustParse(model.UID),
-		FirstName:             model.FirstName,
-		LastName:              model.LastName,
-		Email:                 model.Email,
-		Username:              model.Username,
-		Password:              model.Username,
-		UrlRedirectActivation: model.UrlRedirectLaterActivation,
-		VerifiedEmail:         model.VerifiedEmail,
-		IsActive:              model.IsActive,
-		ActivedAt:             model.ActivedAt,
-		LastLogin:             model.LastLogin,
+		ID:            model.ID.Hex(),
+		ProjectID:     model.ProjectID.Hex(),
+		UID:           uuid.MustParse(model.UID),
+		FirstName:     model.FirstName,
+		LastName:      model.LastName,
+		Email:         model.Email,
+		Username:      model.Username,
+		Password:      model.Password,
+		VerifiedEmail: model.VerifiedEmail,
+		IsActive:      model.IsActive,
+		ActivedAt:     model.ActivedAt,
+		LastLogin:     model.LastLogin,
 	}
 
 	return account
@@ -94,19 +93,18 @@ func (p *AccountRepositoryDB) entityToModel(account entity.Account) *AccountMode
 	}
 
 	model := &AccountModel{
-		ID:                         accountID,
-		ProjectID:                  projectID,
-		UID:                        account.UID.String(),
-		FirstName:                  account.FirstName,
-		LastName:                   account.LastName,
-		Email:                      account.Email,
-		Username:                   account.Username,
-		Password:                   account.Password,
-		LastLogin:                  account.LastLogin,
-		UrlRedirectLaterActivation: account.UrlRedirectActivation,
-		IsActive:                   account.IsActive,
-		VerifiedEmail:              account.VerifiedEmail,
-		ActivedAt:                  account.ActivedAt,
+		ID:            accountID,
+		ProjectID:     projectID,
+		UID:           account.UID.String(),
+		FirstName:     account.FirstName,
+		LastName:      account.LastName,
+		Email:         account.Email,
+		Username:      account.Username,
+		Password:      account.Password,
+		LastLogin:     account.LastLogin,
+		IsActive:      account.IsActive,
+		VerifiedEmail: account.VerifiedEmail,
+		ActivedAt:     account.ActivedAt,
 	}
 
 	return model
@@ -202,5 +200,13 @@ func (repo *AccountRepositoryDB) UpdateLastLogin(id string) error {
 	now := time.Now()
 	return repo.documentDB.UpdateOne(ACCOUNT, oid, bson.D{
 		{"$set", bson.D{{LAST_LOGIN, now}, {UPDATED_AT, now}, {UPDATED_BY, SYSTEM}}},
+	})
+}
+
+func (repo *AccountRepositoryDB) UpdatePassword(id string, password string) error {
+	oid, _ := primitive.ObjectIDFromHex(id)
+	now := time.Now()
+	return repo.documentDB.UpdateOne(ACCOUNT, oid, bson.D{
+		{"$set", bson.D{{PASSWORD, password}, {UPDATED_AT, now}, {UPDATED_BY, SYSTEM}}},
 	})
 }

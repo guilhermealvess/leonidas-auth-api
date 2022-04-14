@@ -19,8 +19,7 @@ func (s *ApiServerServices) SignIn(ctx context.Context, in *pb.SigninRequest) (*
 		return &pb.SigninReply{
 			Success: false,
 			Error:   err.Error(),
-			Token:   "",
-		}, err
+		}, nil
 	}
 
 	return &pb.SigninReply{
@@ -43,13 +42,11 @@ func (s *ApiServerServices) VerifyToken(ctx context.Context, in *pb.VerifyTokenR
 		return &pb.VerifyTokenReply{
 			Success: false,
 			Error:   err.Error(),
-			Payload: &pb.Payload{},
 		}, nil
 	}
 
 	return &pb.VerifyTokenReply{
 		Success: true,
-		Error:   "",
 		Payload: &pb.Payload{
 			Id:        output.Payload.ID,
 			Email:     output.Payload.Email,
